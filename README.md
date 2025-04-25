@@ -1,58 +1,58 @@
-# Svelte library
+# Him AI Trading Buddy Extension
 
-Everything you need to build a Svelte library, powered by [`sv`](https://npmjs.com/package/sv).
+A Chrome Extension featuring an AI chatbot interface called "Him" for providing market insights directly within your browser's side panel.
 
-Read more about creating a library [in the docs](https://svelte.dev/docs/kit/packaging).
+## Features
 
-## Creating a project
+- **Atmospheric UI**: Dark space/nebula theme with glow effects
+- **Animated Background**: Dynamic animated background with stars and nebula effect
+- **Chat Interface**: Displays market sentiment, analysis, and response messages
+- **Side Panel Integration**: Seamlessly integrates with Chrome's side panel API
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Tech Stack
 
-```bash
-# create a new project in the current directory
-npx sv create
+- **SvelteKit**: UI framework and component system
+- **TypeScript**: Type-safe JavaScript
+- **Tailwind CSS**: Utility-first styling
+- **Chrome Extensions API**: Manifest V3 with Side Panel support
 
-# create a new project in my-app
-npx sv create my-app
-```
+## Development
 
-## Developing
+### Prerequisites
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+- Node.js (LTS recommended)
+- pnpm
 
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-Everything inside `src/lib` is part of your library, everything inside `src/routes` can be used as a showcase or preview app.
-
-## Building
-
-To build your library:
+### Setup
 
 ```bash
-npm run package
+# Install dependencies
+pnpm install
+
+# Start development server
+pnpm dev
+
+# Build for production
+pnpm build
 ```
 
-To create a production version of your showcase app:
+### Loading the Extension
 
-```bash
-npm run build
-```
+1. Build the project: `pnpm build`
+2. Open Chrome and navigate to `chrome://extensions/`
+3. Enable "Developer mode"
+4. Click "Load unpacked" and select the `build` directory
 
-You can preview the production build with `npm run preview`.
+## Project Structure
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+- `/src`: SvelteKit app code
+  - `/routes`: SvelteKit routes
+  - `/lib/components`: Reusable Svelte components
+- `/static`: Static assets and extension files
+  - `manifest.json`: Chrome extension manifest
+  - `background.js`: Service worker
+- `/build`: Built extension (after running `pnpm build`)
 
-## Publishing
+## Status
 
-Go into the `package.json` and give your package the desired name through the `"name"` option. Also consider adding a `"license"` field and point it to a `LICENSE` file which you can create from a template (one popular option is the [MIT license](https://opensource.org/license/mit/)).
-
-To publish your library to [npm](https://www.npmjs.com):
-
-```bash
-npm publish
-```
+This is currently a UI prototype. Future versions will integrate with real market data and AI analysis.

@@ -1,0 +1,29 @@
+{
+	"name": "Him AI Trading Buddy",
+	"description": "An AI trading assistant for market insights and sentiment analysis",
+	"version": "1.0",
+	"manifest_version": 3,
+	"permissions": ["sidePanel"],
+	"action": {
+		"default_title": "Open Him trading buddy",
+		"default_icon": {
+			"16": "favicon.png",
+			"32": "favicon.png",
+			"48": "favicon.png",
+			"128": "favicon.png"
+		}
+	},
+	"icons": {
+		"16": "favicon.png",
+		"32": "favicon.png",
+		"48": "favicon.png",
+		"128": "favicon.png"
+	},
+	"side_panel": {
+		"default_path": "index.html"
+	},
+	"background": {
+		"service_worker": "background.js",
+		"type": "module"
+	}
+}
