@@ -1,13 +1,17 @@
-import adapter from '@sveltejs/adapter-auto';
-import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
-import { mdsvex } from 'mdsvex';
+import adapter from 'sveltekit-adapter-chrome-extension';
 
 const config = {
-	preprocess: [vitePreprocess(), mdsvex()],
 	kit: {
-		adapter: adapter()
-	},
-	extensions: ['.svelte', '.svx']
+		adapter: adapter({
+			// default options are shown
+			pages: 'build',
+			assets: 'build',
+			fallback: null,
+			precompress: false,
+			manifest: 'manifest.json'
+		}),
+		appDir: 'app'
+	}
 };
 
 export default config;

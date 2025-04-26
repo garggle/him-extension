@@ -1,4 +1,6 @@
 <script lang="ts">
+	export const prerender = true;
+
 	import MessageBubble from './MessageBubble.svelte';
 
 	// Define the message interface

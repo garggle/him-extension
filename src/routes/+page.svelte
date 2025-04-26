@@ -14,83 +14,97 @@
 		};
 	}
 
-	// Sample messages based on the provided image
-	const messages: Message[] = [
-		{
-			id: 1,
-			sender: 'system',
-			text: 'vol just popped. {value} in 5 minutes. also, some whales preheating the oven.',
-			metadata: { value: '157k' }
-		},
-		{
-			id: 2,
-			sender: 'other',
-			text: 'ye but those sell walls look nastyyy {buys} buys {sells} sells bro',
-			metadata: { buys: 269, sells: 158 }
-		},
-		{
-			id: 3,
-			sender: 'system',
-			text: "buy pressure's weak sauce, bro. sentiment's shaky"
-		},
-		{
-			id: 4,
-			sender: 'system',
-			text: 'TG is 60% fear, 30% cope, 10% memes + wallets with <50k are panic selling. classic retail flush.'
-		},
-		{
-			id: 5,
-			sender: 'self',
-			text: 'so what, sit out?'
-		},
-		{
-			id: 6,
-			sender: 'other',
-			text: "if you ape now, you're catching a falling knife with no handle"
-		},
-		{
-			id: 7,
-			sender: 'other',
-			text: 'better to let the plebs exhaust themselves'
-		},
-		{
-			id: 8,
-			sender: 'other',
-			text: 'if it reclaims {value} cap with healthy CEX volume then we talk',
-			metadata: { value: '8.5M' }
-		},
-		{
-			id: 9,
-			sender: 'self',
-			text: 'alr, ill watch. ping me if it flips pls'
-		},
-		{
-			id: 10,
-			sender: 'other',
-			text: 'u got it king'
-		}
-	];
+	let messages: Message[] = [];
+	let isLoading = false;
+	let nextId = 1;
 
 	// Variable for the current input text
 	let currentInput = '';
 
-	// Handle sending a message (placeholder for now)
-	function handleSend(event: CustomEvent<string>) {
-		console.log('Sending:', event.detail);
+	async function handleSend(event: CustomEvent<string>) {
+		const userMessage = event.detail;
+
+		// Add user message to chat
+		messages = [
+			...messages,
+			{
+				id: nextId++,
+				sender: 'self',
+				text: userMessage
+			}
+		];
+
+		// Set loading state
+		isLoading = true;
+
+		try {
+			// Make API call to OpenAI
+			const response = await fetch('/api/chat', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					message: userMessage,
+					// Send only the last 10 messages to keep the context manageable
+					history: messages.slice(-10)
+				})
+			});
+
+			if (!response.ok) {
+				throw new Error(`HTTP error! status: ${response.status}`);
+			}
+
+			const data = await response.json();
+
+			// Add AI response to chat
+			messages = [
+				...messages,
+				{
+					id: nextId++,
+					sender: 'other',
+					text: data.reply
+				}
+			];
+		} catch (error) {
+			console.error('Error calling chat API:', error);
+
+			// Add error message
+			messages = [
+				...messages,
+				{
+					id: nextId++,
+					sender: 'system',
+					text: 'Failed to get a response. Please try again.'
+				}
+			];
+		} finally {
+			isLoading = false;
+		}
 	}
 </script>
 
 <div class="flex flex-col h-full w-full">
 	<!-- Header -->
-	<header class="p-2 border-b border-purple-700/30">
-		<h1 class="text-md font-orbitron text-glow-purple text-center">
-			<span class="text-primary">*</span> Him <span class="text-primary">*</span>
-		</h1>
+	<header class="p-2">
+		<div class="flex justify-center">
+			<h1
+				class="w-[288px] h-[30px] font-['Space_Mono'] font-bold text-[20px] leading-[30px] text-[#EED2FF] text-center"
+				style="text-shadow: 0px 0px 8px rgba(238, 210, 255, 0.7);"
+			>
+				Him
+			</h1>
+		</div>
 	</header>
 
 	<!-- Chat area (messages) -->
 	<ChatArea {messages} />
 
+	<!-- Loading indicator (if needed) -->
+	{#if isLoading}
+		<div class="text-center text-sm text-[#EED2FF]/70 p-1">Thinking...</div>
+	{/if}
+
 	<!-- Input area -->
-	<InputArea bind:value={currentInput} on:send={handleSend} />
+	<InputArea bind:value={currentInput} on:send={handleSend} disabled={isLoading} />
 </div>

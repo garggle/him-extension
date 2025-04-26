@@ -2,8 +2,23 @@
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 
-@tailwind base;
-@tailwind components;
+/* Space Mono Font */
+@font-face {
+	font-family: 'Space Mono';
+	src: url('/fonts/SpaceMono-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Space Mono';
+	src: url('/fonts/SpaceMono-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+}
+
 @tailwind utilities;
 
 /* Define custom theme variables using the new @theme directive */
@@ -41,8 +56,8 @@ body {
 	background-color: black;
 	/* Use HSL function to reference our dynamic color variables */
 	color: hsl(var(--foreground));
+	font-family: 'Space Mono', monospace;
 	overflow: hidden;
-	cursor: none;
 	min-height: 100vh;
 	/* Mobile viewport height fix */
 	min-height: -webkit-fill-available;
@@ -69,18 +84,6 @@ body {
 /* Disable text selection */
 * {
 	user-select: none;
-}
-
-/* Hide default cursor */
-* {
-	cursor: none !important;
-}
-
-/* Mobile cursor fix */
-@media (max-width: 768px) {
-	* {
-		cursor: auto !important;
-	}
 }
 
 /* Text glow effects - updated to use CSS variables */
@@ -149,5 +152,5 @@ body {
 
 /* Font classes */
 .font-orbitron {
-	font-family: 'Orbitron', sans-serif;
+	font-family: 'Space Mono', monospace;
 }

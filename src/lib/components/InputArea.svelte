@@ -1,30 +1,39 @@
 <script lang="ts">
+	export const prerender = true;
+
 	import { createEventDispatcher } from 'svelte';
 
 	export let value = '';
+	export let disabled = false;
 
 	const dispatch = createEventDispatcher<{
 		send: string;
 	}>();
 
 	function handleSend() {
-		if (value.trim()) {
+		if (value.trim() && !disabled) {
 			dispatch('send', value);
 			value = '';
 		}
 	}
 </script>
 
-<div class="p-2 border-t border-purple-700/30">
+<div class="p-2">
 	<div class="flex">
 		<input
 			type="text"
 			bind:value
-			placeholder="Type a message..."
-			class="flex-1 bg-purple-900/20 text-white p-2 rounded-l-md focus:outline-none border border-purple-700/30"
+			{disabled}
+			class="flex-1 bg-user-bg/50 text-user-text p-2 rounded-l-md focus:outline-none border border-user-border/60 placeholder:text-user-text/70 text-sm"
 			on:keydown={(e) => e.key === 'Enter' && handleSend()}
+			placeholder="Type a message..."
 		/>
-		<button class="bg-purple-700 text-white p-2 rounded-r-md" on:click={handleSend}>
+		<button
+			class="bg-user-bg/50 text-user-text p-2 rounded-r-md border border-l-0 border-user-border/60"
+			on:click={handleSend}
+			{disabled}
+			aria-label="Send message"
+		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				class="h-5 w-5 transform rotate-90"
@@ -38,3 +47,28 @@
 		</button>
 	</div>
 </div>
+
+<style>
+	/* Custom input styling with glow effect */
+	input:focus {
+		outline: none;
+		box-shadow:
+			0 0 8px hsla(var(--primary), 0.7),
+			0 0 12px hsla(var(--primary), 0.5);
+		border-color: hsla(var(--primary-foreground), 0.6);
+	}
+
+	/* Glow effect for placeholder */
+	input::placeholder {
+		text-shadow:
+			0 0 5px hsla(var(--primary), 0.4),
+			0 0 8px hsla(var(--primary), 0.3);
+	}
+
+	/* Styles for disabled state */
+	input:disabled,
+	button:disabled {
+		opacity: 0.7;
+		cursor: not-allowed;
+	}
+</style>

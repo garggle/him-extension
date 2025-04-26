@@ -64,6 +64,7 @@
 		"publint": "^0.3.2",
 		"svelte": "^5.0.0",
 		"svelte-check": "^4.0.0",
+		"sveltekit-adapter-chrome-extension": "^2.0.1",
 		"tailwindcss": "^4.1.4",
 		"typescript": "^5.0.0",
 		"typescript-eslint": "^8.20.0",
@@ -80,7 +81,9 @@
 		"@tailwindcss/cli": "^4.1.4",
 		"@types/chrome": "^0.0.317",
 		"autoprefixer": "^10.4.21",
+		"dotenv": "^16.5.0",
 		"drizzle-orm": "^0.40.0",
+		"openai": "^4.96.0",
 		"postcss": "^8.5.3",
 		"postgres": "^3.4.5"
 	},

@@ -1,0 +1,30 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+{
+  "core": {
+    "framework": "SvelteKit 2.20.7, Svelte 5.28.2, Tailwind 4.1, Vite, TypeScript",
+    "architecture": "UI Layer with Atomic Layers, Domain Layer with Model classes being called Entities, Data Layer with APIs and repositories, Application Layer with Services",
+    "uilayer": "We follow an atomic design perspective, bases = atoms, blocks = molecules, sections = organisms, views = pages",
+    "stateManagement": "Runes in Svelte 5",
+    "style": "Concise readable code with small classes and methods"
+  },
+  "structure": "lib/{shared/{bases, blocks, constants, entities, utils, theme, exceptions}, features/feature_name/{data/{repositories, datasources}, entities, application, ui/{bases, blocks, sections, views}}}; routes/; test/{unit,  integration}",
+  "bestPractices": [
+    "Functions should do one thing well and be very concise",
+    "Clean code principles",
+    "Null safety and strict typing where possible",
+    "Proper error handling (e.g., Either type)",
+    "Proper state management with Runes",
+    "Small, focused classes",
+    "Performance-aware builds (image caching, list view optimization)",
+    "Make use of TDD to test business logic, UI, and integrations"
+  ],
+  "PEDAC": {
+    "plan": "When asked to plan or faced with a random prompt, follow the PEDA steps of the PEDAC method (Problem, Examples, Data structures, Algorithm).",
+    "code": "When asked to code or implement, always request the algorithm derived from a PEDAC plan before implementation."
+  }
+}

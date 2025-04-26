@@ -1,6 +1,6 @@
 # Him AI Trading Buddy Extension
 
-A Chrome Extension featuring an AI chatbot interface called "Him" for providing market insights directly within your browser's side panel.
+A Chrome Extension featuring an AI chatbot interface called "Him" for providing market insights directly within your browser's side panel. Now featuring GPT-4o integration for intelligent responses.
 
 ## Features
 
@@ -29,12 +29,29 @@ A Chrome Extension featuring an AI chatbot interface called "Him" for providing 
 # Install dependencies
 pnpm install
 
+# Set up your OpenAI API key
+# Copy the .env.example file to .env and add your OpenAI API key
+cp .env.example .env
+# Then edit the .env file with your actual API key
+
 # Start development server
 pnpm dev
 
 # Build for production
 pnpm build
 ```
+
+### OpenAI Integration
+
+This project uses OpenAI's GPT-4o model to provide intelligent responses in the chat interface. To set up the OpenAI integration:
+
+1. Create an account at [OpenAI](https://openai.com) if you don't already have one
+2. Generate an API key in your OpenAI dashboard
+3. Add the API key to your `.env` file:
+   ```
+   OPENAI_API_KEY=your_actual_api_key_here
+   ```
+4. Restart your development server if it's already running
 
 ### Loading the Extension
 

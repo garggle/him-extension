@@ -3,6 +3,12 @@ export default {
 	darkMode: ['class'],
 	content: ['./src/**/*.{html,js,svelte,ts}', './src/**/*.{js,ts,jsx,tsx,mdx}'],
 	theme: {
+		fontFamily: {
+			sans: ['Space Mono', 'monospace'],
+			serif: ['Space Mono', 'monospace'],
+			mono: ['Space Mono', 'monospace'],
+			orbitron: ['Space Mono', 'monospace']
+		},
 		extend: {
 			colors: {
 				border: 'hsl(var(--border))',
@@ -73,10 +79,6 @@ export default {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
-			},
-			fontFamily: {
-				mono: ['Space Mono', 'monospace'],
-				orbitron: ['Orbitron', 'sans-serif']
 			},
 			animation: {
 				blink: 'blink 1s infinite',
