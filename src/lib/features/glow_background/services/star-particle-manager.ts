@@ -1,4 +1,4 @@
-import { starPalettes } from '$lib/shared/constants/GlowConstants.js';
+import { starPalettes } from '$lib/shared/constants/glow-constants.js';
 import { SimulationConfig } from '../config/simulation-config.js';
 import { StarConfig } from '../config/star-config.js';
 import type { StarParticle } from '../entities/star-particle.js';

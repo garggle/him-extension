@@ -1,6 +1,6 @@
-import { nebulaPalettes } from '$lib/shared/constants/GlowConstants.js';
-import { easeInOut } from '$lib/shared/utils/AnimationUtils.js';
-import { calculateDistance } from '$lib/shared/utils/GeometryUtils.js';
+import { nebulaPalettes } from '$lib/shared/constants/glow-constants.js';
+import { easeInOut } from '$lib/shared/utils/animation-utils.js';
+import { calculateDistance } from '$lib/shared/utils/geometry-utils.js';
 import { CloudConfig } from '../config/cloud-config.js';
 import { SimulationConfig } from '../config/simulation-config.js';
 import type { NebulaCloudCore } from '../entities/nebula-cloud-core.js';

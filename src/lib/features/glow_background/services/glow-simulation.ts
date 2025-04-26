@@ -1,5 +1,5 @@
-import { nebulaPalettes } from '$lib/shared/constants/GlowConstants.js';
-import { hexToHsl, rgbaHexToHex } from '$lib/shared/utils/ColorUtils.js';
+import { nebulaPalettes } from '$lib/shared/constants/glow-constants.js';
+import { hexToHsl, rgbaHexToHex } from '$lib/shared/utils/color-utils.js';
 import { SimulationConfig } from '../config/simulation-config.js';
 import type { NebulaEntity } from '../entities/nebula-entity.js';
 import { NebulaCloudManager } from './nebula-cloud-manager.js';

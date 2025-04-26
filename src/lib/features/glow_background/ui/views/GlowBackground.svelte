@@ -1,7 +1,7 @@
 <script lang="ts">
 	export const prerender = true;
 
-	import { MOBILE_BREAKPOINT } from '$lib/shared/constants/GlowConstants.js';
+	import { MOBILE_BREAKPOINT } from '$lib/shared/constants/glow-constants.js';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import type { NebulaCloud } from '../../entities/nebula-cloud.js';
