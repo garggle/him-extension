@@ -1,11 +1,24 @@
-import { env } from '$env/dynamic/private';
-import { json } from '@sveltejs/kit';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import express, { Request, Response } from 'express';
 import OpenAI from 'openai';
 
+// Load environment variables from .env file
+dotenv.config();
+
+// Initialize Express app
+const app = express();
+const port = process.env.PORT || 3001; // Use port from env or default to 3001
+
+// --- OpenAI Setup ---
+const apiKey = process.env.OPENAI_API_KEY;
+if (!apiKey) {
+	console.error('Error: OPENAI_API_KEY is not set in the environment variables.');
+	process.exit(1); // Exit if the API key is missing
+}
+
 // Initialize the OpenAI client
-const openai = new OpenAI({
-	apiKey: env.OPENAI_API_KEY
-});
+const openai = new OpenAI({ apiKey });
 
 // Detailed system prompt for trading buddy persona
 const SYSTEM_PROMPT = `Wait for the user to give you signals or ask you questions.
@@ -23,17 +36,34 @@ Use numbers naturally — like 8.5M cap, 157k volume in 5 min, <50k wallets — 
 Sound like a smart friend watching the chart with you, not a bot, not a clown, not a professor.
 `;
 
-export async function POST({ request }) {
+// --- Middleware ---
+// Enable CORS for all origins (adjust for production if needed)
+app.use(cors());
+// Parse JSON request bodies
+app.use(express.json());
+
+// --- API Route ---
+// Define the interface for expected history messages
+interface HistoryMessage {
+	sender: 'self' | 'other' | 'system';
+	text: string;
+}
+
+app.post('/api/chat', async (req: Request, res: Response) => {
 	try {
 		// Parse the incoming request body
-		const { message, history = [] } = await request.json();
+		const { message, history = [] } = req.body as { message: string; history?: HistoryMessage[] };
+
+		if (!message) {
+			return res.status(400).json({ error: 'Message is required' });
+		}
 
 		// Create messages array for OpenAI API
-		const messages = [
+		const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
 			{ role: 'system', content: SYSTEM_PROMPT },
 			// Add previous conversation history if provided
-			...history.map((msg: { sender: string; text: string }) => ({
-				role: msg.sender === 'self' ? 'user' : 'assistant',
+			...history.map((msg) => ({
+				role: msg.sender === 'self' ? ('user' as const) : ('assistant' as const),
 				content: msg.text
 			})),
 			// Add the current message
@@ -51,13 +81,20 @@ export async function POST({ request }) {
 			completion.choices[0]?.message?.content || 'Sorry, I could not generate a response.';
 
 		// Return the reply
-		return json({ reply });
+		return res.json({ reply });
 	} catch (error: unknown) {
 		console.error('Error calling OpenAI API:', error);
 		const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-		return json(
-			{ error: 'Failed to get response from AI', details: errorMessage },
-			{ status: 500 }
-		);
+		// Avoid sending potentially sensitive details back to the client
+		return res.status(500).json({
+			error: 'Failed to get response from AI'
+			// Optionally include non-sensitive details in development
+			// details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+		});
 	}
-}
+});
+
+// --- Start Server ---
+app.listen(port, () => {
+	console.log(`Local API server listening on http://localhost:${port}`);
+});

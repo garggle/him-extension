@@ -1,4 +1,4 @@
-import type { NebulaCloud } from '../entities/NebulaCloud.js';
+import type { NebulaCloud } from '../entities/nebula-cloud.js';
 
 // Draw star with multi-layered glow
 const drawGlowingStar = (

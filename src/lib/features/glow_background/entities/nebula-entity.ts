@@ -1,5 +1,5 @@
-import type { NebulaCloud } from './NebulaCloud.js';
-import type { StarParticle } from './StarParticle.js';
+import type { NebulaCloud } from './nebula-cloud.js';
+import type { StarParticle } from './star-particle.js';
 
 /**
  * Combined type for both nebula clouds and star particles

@@ -26,5 +26,10 @@ alwaysApply: true
   "PEDAC": {
     "plan": "When asked to plan or faced with a random prompt, follow the PEDA steps of the PEDAC method (Problem, Examples, Data structures, Algorithm).",
     "code": "When asked to code or implement, always request the algorithm derived from a PEDAC plan before implementation."
+  },
+  "NamingConventions: {
+    "svelteComponents": "PascalCase",
+    "pageRouteFiles": "+lowercase",
+    "typescript": "kebab-case"
   }
 }

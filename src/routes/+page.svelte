@@ -1,6 +1,8 @@
 <script lang="ts">
-	import ChatArea from '$lib/components/ChatArea.svelte';
-	import InputArea from '$lib/components/InputArea.svelte';
+	import { PUBLIC_API_BASE_URL } from '$env/static/public';
+	import { axiomService } from '$lib/features/axiom/index.js';
+	import ChatArea from '$lib/features/chat/ChatArea.svelte';
+	import InputArea from '$lib/features/chat/InputArea.svelte';
 
 	// Define the message interface
 	interface Message {
@@ -21,9 +23,10 @@
 	// Variable for the current input text
 	let currentInput = '';
 
-	async function handleSend(event: CustomEvent<string>) {
-		const userMessage = event.detail;
+	// Axiom data status
+	let axiomDataStatus = '';
 
+	async function handleSend(userMessage: string) {
 		// Add user message to chat
 		messages = [
 			...messages,
@@ -38,8 +41,9 @@
 		isLoading = true;
 
 		try {
-			// Make API call to OpenAI
-			const response = await fetch('/api/chat', {
+			// Make API call to configured base URL
+			const apiUrl = `${PUBLIC_API_BASE_URL}/api/chat`;
+			const response = await fetch(apiUrl, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
@@ -82,6 +86,25 @@
 			isLoading = false;
 		}
 	}
+
+	// Function to fetch Axiom data and log to console
+	async function fetchAxiomData() {
+		try {
+			axiomDataStatus = 'Fetching data...';
+			const tokenData = await axiomService.getTokenData();
+
+			if (tokenData) {
+				console.log('Axiom Token Data:', tokenData);
+				axiomDataStatus = 'Data fetched successfully! Check the console.';
+			} else {
+				console.log('Not on an Axiom meme token page. URL must match axiom.trade/meme/{tokenId}');
+				axiomDataStatus = 'Not on an Axiom meme page. Must be on axiom.trade/meme/{tokenId}';
+			}
+		} catch (error) {
+			console.error('Error fetching Axiom data:', error);
+			axiomDataStatus = 'Error fetching data. Check console for details.';
+		}
+	}
 </script>
 
 <div class="flex flex-col h-full w-full">
@@ -106,5 +129,18 @@
 	{/if}
 
 	<!-- Input area -->
-	<InputArea bind:value={currentInput} on:send={handleSend} disabled={isLoading} />
+	<InputArea bind:value={currentInput} onsend={handleSend} disabled={isLoading} />
+
+	<!-- Axiom Data Fetcher Button -->
+	<div class="p-2 mt-2 border-t border-gray-800">
+		<button
+			on:click={fetchAxiomData}
+			class="w-full py-2 px-4 bg-purple-800 hover:bg-purple-700 rounded text-sm text-white transition-colors"
+		>
+			Fetch Axiom Token Data
+		</button>
+		{#if axiomDataStatus}
+			<p class="text-xs mt-1 text-center text-gray-300">{axiomDataStatus}</p>
+		{/if}
+	</div>
 </div>

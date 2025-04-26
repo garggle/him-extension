@@ -3,7 +3,8 @@
 	"description": "An AI trading assistant for market insights and sentiment analysis",
 	"version": "1.0",
 	"manifest_version": 3,
-	"permissions": ["sidePanel"],
+	"permissions": ["sidePanel", "tabs", "scripting"],
+	"host_permissions": ["*://*.axiom.trade/*"],
 	"action": {
 		"default_title": "Open Him trading buddy",
 		"default_icon": {

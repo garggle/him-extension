@@ -4,10 +4,10 @@
 	import { MOBILE_BREAKPOINT } from '$lib/shared/constants/GlowConstants.js';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import type { NebulaCloud } from './entities/NebulaCloud.js';
-	import type { StarParticle } from './entities/StarParticle.js';
-	import { drawGlowingStar, drawNebulaCloud } from './services/GlowRenderer.js';
-	import { GlowSimulation } from './services/GlowSimulation.js';
+	import type { NebulaCloud } from '../../entities/nebula-cloud.js';
+	import type { StarParticle } from '../../entities/star-particle.js';
+	import { drawGlowingStar, drawNebulaCloud } from '../../services/glow-renderer.js';
+	import { GlowSimulation } from '../../services/glow-simulation.js';
 
 	// Component state
 	let canvasElement: HTMLCanvasElement;

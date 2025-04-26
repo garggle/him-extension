@@ -1,7 +1,7 @@
 <script lang="ts">
 	export const prerender = true;
 
-	import MessageBubble from './MessageBubble.svelte';
+	import MessageBubble from '$lib/features/chat/MessageBubble.svelte';
 
 	// Define the message interface
 	interface Message {

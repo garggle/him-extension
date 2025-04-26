@@ -1,9 +1,9 @@
 import { nebulaPalettes } from '$lib/shared/constants/GlowConstants.js';
 import { hexToHsl, rgbaHexToHex } from '$lib/shared/utils/ColorUtils.js';
-import { SimulationConfig } from '../config/SimulationConfig.js';
-import type { NebulaEntity } from '../entities/NebulaEntity.js';
-import { NebulaCloudManager } from './NebulaCloudManager.js';
-import { StarParticleManager } from './StarParticleManager.js';
+import { SimulationConfig } from '../config/simulation-config.js';
+import type { NebulaEntity } from '../entities/nebula-entity.js';
+import { NebulaCloudManager } from './nebula-cloud-manager.js';
+import { StarParticleManager } from './star-particle-manager.js';
 
 // Combined type for sorting by depth
 // export type NebulaEntity = NebulaCloud | StarParticle;

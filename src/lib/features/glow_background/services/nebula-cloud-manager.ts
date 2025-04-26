@@ -1,10 +1,10 @@
 import { nebulaPalettes } from '$lib/shared/constants/GlowConstants.js';
 import { easeInOut } from '$lib/shared/utils/AnimationUtils.js';
 import { calculateDistance } from '$lib/shared/utils/GeometryUtils.js';
-import { CloudConfig } from '../config/CloudConfig.js';
-import { SimulationConfig } from '../config/SimulationConfig.js';
-import type { NebulaCloud } from '../entities/NebulaCloud.js';
-import type { NebulaCloudCore } from '../entities/NebulaCloudCore.js';
+import { CloudConfig } from '../config/cloud-config.js';
+import { SimulationConfig } from '../config/simulation-config.js';
+import type { NebulaCloudCore } from '../entities/nebula-cloud-core.js';
+import type { NebulaCloud } from '../entities/nebula-cloud.js';
 
 export class NebulaCloudManager {
 	private nebulaClouds: NebulaCloud[] = [];

@@ -1,7 +1,7 @@
 import { starPalettes } from '$lib/shared/constants/GlowConstants.js';
-import { SimulationConfig } from '../config/SimulationConfig.js';
-import { StarConfig } from '../config/StarConfig.js';
-import type { StarParticle } from '../entities/StarParticle.js';
+import { SimulationConfig } from '../config/simulation-config.js';
+import { StarConfig } from '../config/star-config.js';
+import type { StarParticle } from '../entities/star-particle.js';
 
 export class StarParticleManager {
 	private starParticles: StarParticle[] = [];

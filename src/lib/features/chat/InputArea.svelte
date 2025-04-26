@@ -1,19 +1,18 @@
 <script lang="ts">
 	export const prerender = true;
 
-	import { createEventDispatcher } from 'svelte';
-
-	export let value = '';
-	export let disabled = false;
-
-	const dispatch = createEventDispatcher<{
-		send: string;
-	}>();
+	let { value = $bindable(''), disabled = false, onsend } = $props();
 
 	function handleSend() {
 		if (value.trim() && !disabled) {
-			dispatch('send', value);
+			onsend?.(value);
 			value = '';
+		}
+	}
+
+	function handleKeydown(e: KeyboardEvent) {
+		if (e.key === 'Enter') {
+			handleSend();
 		}
 	}
 </script>
@@ -25,12 +24,12 @@
 			bind:value
 			{disabled}
 			class="flex-1 bg-user-bg/50 text-user-text p-2 rounded-l-md focus:outline-none border border-user-border/60 placeholder:text-user-text/70 text-sm"
-			on:keydown={(e) => e.key === 'Enter' && handleSend()}
+			onkeydown={handleKeydown}
 			placeholder="Type a message..."
 		/>
 		<button
 			class="bg-user-bg/50 text-user-text p-2 rounded-r-md border border-l-0 border-user-border/60"
-			on:click={handleSend}
+			onclick={handleSend}
 			{disabled}
 			aria-label="Send message"
 		>

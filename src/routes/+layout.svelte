@@ -1,5 +1,5 @@
 <script lang="ts">
-	import GlowBackground from '$lib/glow_background/GlowBackground.svelte';
+	import GlowBackground from '$lib/features/glow_background/ui/views/GlowBackground.svelte';
 	import '../app.css';
 
 	let { children } = $props();

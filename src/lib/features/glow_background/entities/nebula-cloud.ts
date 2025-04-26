@@ -1,4 +1,4 @@
-import type { NebulaCloudCore } from './NebulaCloudCore.js';
+import type { NebulaCloudCore } from './nebula-cloud-core.js';
 
 interface NebulaCloud {
 	x: number;
