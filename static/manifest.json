@@ -3,8 +3,12 @@
 	"description": "An AI trading assistant for market insights and sentiment analysis",
 	"version": "1.0",
 	"manifest_version": 3,
-	"permissions": ["sidePanel", "tabs", "scripting"],
-	"host_permissions": ["*://*.axiom.trade/*"],
+	"permissions": ["sidePanel", "tabs", "scripting", "clipboardRead", "clipboardWrite", "storage"],
+	"host_permissions": [
+		"*://*.axiom.trade/*",
+		"https://api.geckoterminal.com/*",
+		"https://api.openai.com/*"
+	],
 	"action": {
 		"default_title": "Open Him trading buddy",
 		"default_icon": {
@@ -26,5 +30,12 @@
 	"background": {
 		"service_worker": "background.js",
 		"type": "module"
-	}
+	},
+	"content_scripts": [
+		{
+			"matches": ["*://axiom.trade/meme/*"],
+			"js": ["content-scripts/axiom-analyzer.js"],
+			"run_at": "document_idle"
+		}
+	]
 }

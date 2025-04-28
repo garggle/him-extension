@@ -1,8 +1,8 @@
 /**
  * Service for Axiom token data operations
  */
-import type { AxiomTokenData } from '../data/datasources/axiom-scraper.js';
 import { axiomRepository } from '../data/repositories/axiom-repository.js';
+import type { AxiomTokenData } from '../entities/token-data.js';
 
 /**
  * Service class for handling Axiom token operations

@@ -1,8 +1,15 @@
 <script lang="ts">
-	import { PUBLIC_API_BASE_URL } from '$env/static/public';
-	import { axiomService } from '$lib/features/axiom/index.js';
+	import ApiKeySetup from '$lib/features/chat/ApiKeySetup.svelte';
 	import ChatArea from '$lib/features/chat/ChatArea.svelte';
+	import {
+		hasApiKey,
+		sendChatRequest,
+		type HistoryMessage
+	} from '$lib/features/chat/data/openai-api.js';
+	import { getTradeAdvice } from '$lib/features/chat/data/trading-analyzer.js';
 	import InputArea from '$lib/features/chat/InputArea.svelte';
+	import { splitIntoMessages } from '$lib/shared/utils/message-splitter.js';
+	import { onMount } from 'svelte';
 
 	// Define the message interface
 	interface Message {
@@ -16,15 +23,235 @@
 		};
 	}
 
-	let messages: Message[] = [];
-	let isLoading = false;
+	// State management using Svelte 5 runes
+	let messages = $state<Message[]>([]);
+	let isLoading = $state(false);
+	let apiKeyConfigured = $state(false);
+	let apiKeyError = $state('');
 	let nextId = 1;
+	let isTyping = $state(false);
+
+	// Check API key status on mount and listen for trade advice messages
+	onMount(() => {
+		checkApiKeyStatus();
+		checkForTradeAdvice();
+		listenForTradeAdvice();
+		listenForTradeAdviceRequests();
+	});
+
+	async function checkApiKeyStatus() {
+		try {
+			apiKeyConfigured = await hasApiKey();
+			apiKeyError = '';
+		} catch (error) {
+			console.error('Error checking API key status:', error);
+			apiKeyConfigured = false;
+		}
+	}
+
+	// Check if there's any trade advice stored in the session
+	async function checkForTradeAdvice() {
+		try {
+			// Get any stored trade advice from extension storage
+			const result = await chrome.storage.session.get('tradeAdvice');
+
+			if (result.tradeAdvice) {
+				// Get the trade advice data
+				const { message, tokenName, tokenData, timestamp } = result.tradeAdvice;
+
+				// Only use it if it's recent (less than 30 seconds old)
+				const isRecent = Date.now() - timestamp < 30000;
+
+				if (isRecent && message) {
+					// Add a system message about the token analysis
+					messages = [
+						...messages,
+						{
+							id: nextId++,
+							sender: 'system',
+							text: `Analysis for ${tokenName || 'Unknown Token'}:
+Price: ${tokenData?.price || 'N/A'}
+Market Cap: ${tokenData?.mcap || 'N/A'}
+Liquidity: ${tokenData?.liquidity || 'N/A'}
+Model: ${tokenData?.decision || 'N/A'} (Score: ${tokenData?.score?.toFixed(2) || 'N/A'})`
+						}
+					];
+
+					// Add the AI advice message with fake typing
+					isTyping = true;
+
+					// Split the advice into chunks for more natural display
+					const messageChunks = splitIntoMessages(message);
+
+					// Add message chunks progressively with delays
+					await addMessagesProgressively(messageChunks);
+
+					// Clear the stored advice to prevent showing it again
+					await chrome.storage.session.remove('tradeAdvice');
+				}
+			}
+		} catch (error) {
+			console.error('Error checking for trade advice:', error);
+		}
+	}
+
+	// Listen for runtime messages about new trade advice
+	function listenForTradeAdvice() {
+		chrome.runtime.onMessage.addListener(async (message) => {
+			if (message.type === 'NEW_TRADE_ADVICE') {
+				const { advice, tokenName, tokenData } = message;
+
+				if (advice) {
+					// Add a system message about the token analysis
+					messages = [
+						...messages,
+						{
+							id: nextId++,
+							sender: 'system',
+							text: `Analysis for ${tokenName || 'Unknown Token'}:
+Price: ${tokenData?.price || 'N/A'}
+Market Cap: ${tokenData?.mcap || 'N/A'}
+Liquidity: ${tokenData?.liquidity || 'N/A'}
+Model: ${tokenData?.decision || 'N/A'} (Score: ${tokenData?.score?.toFixed(2) || 'N/A'})`
+						}
+					];
+
+					// Add the AI advice message with fake typing
+					isTyping = true;
+
+					// Split the advice into chunks for more natural display
+					const messageChunks = splitIntoMessages(advice);
+
+					// Add message chunks progressively with delays
+					await addMessagesProgressively(messageChunks);
+				}
+			}
+		});
+	}
+
+	// Listen for requests to process trade advice
+	function listenForTradeAdviceRequests() {
+		chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+			if (message.type === 'PROCESS_TRADE_ADVICE') {
+				console.log('Extension page received request to process trade advice');
+
+				// Let background script know we're here and processing
+				sendResponse({ received: true });
+
+				try {
+					// Get the pending analysis from session storage
+					const result = await chrome.storage.session.get('pendingAnalysis');
+
+					if (result.pendingAnalysis) {
+						const { analysisResult, snapshot, timestamp } = result.pendingAnalysis;
+
+						// Only process if it's recent (less than 30 seconds old)
+						const isRecent = Date.now() - timestamp < 30000;
+
+						if (isRecent && analysisResult) {
+							// Use the OpenAI API to get trade advice
+							console.log('Processing trade advice request', analysisResult);
+
+							// Get API key and check if configured
+							if (!(await hasApiKey())) {
+								console.error('Cannot process trade advice: OpenAI API key not configured');
+
+								// Open the extension to allow the user to configure the API key
+								return;
+							}
+
+							// Get the trade advice
+							const advice = await getTradeAdvice(analysisResult, snapshot);
+							console.log('Trade advice generated:', advice);
+
+							// Send the advice back to the background script
+							chrome.runtime.sendMessage({
+								type: 'TRADE_ADVICE_READY',
+								tabId: message.origin,
+								advice: advice
+							});
+
+							// Clear the pending analysis
+							await chrome.storage.session.remove('pendingAnalysis');
+						} else if (!isRecent) {
+							console.warn('Pending analysis is too old, ignoring');
+							await chrome.storage.session.remove('pendingAnalysis');
+						}
+					}
+				} catch (error) {
+					console.error('Error processing trade advice request:', error);
+				}
+
+				return false; // No async response needed
+			}
+		});
+	}
+
+	// Reset the API key configuration and show setup screen
+	async function resetApiConfig() {
+		try {
+			await chrome.storage.sync.remove('openaiApiKey');
+			apiKeyConfigured = false;
+			apiKeyError = '';
+		} catch (error) {
+			console.error('Error resetting API key:', error);
+		}
+	}
 
 	// Variable for the current input text
-	let currentInput = '';
+	let currentInput = $state('');
 
-	// Axiom data status
-	let axiomDataStatus = '';
+	/**
+	 * Add a message with a delay to simulate typing
+	 */
+	function addMessageWithDelay(message: Message, delay: number): Promise<void> {
+		return new Promise((resolve) => {
+			setTimeout(() => {
+				messages = [...messages, message];
+				resolve();
+			}, delay);
+		});
+	}
+
+	/**
+	 * Add messages progressively with delay between each
+	 */
+	async function addMessagesProgressively(messageChunks: string[]) {
+		// Note: isTyping is already set to true in handleSend
+
+		// Process each message chunk
+		for (let i = 0; i < messageChunks.length; i++) {
+			const chunk = messageChunks[i];
+
+			// Calculate a base delay based on message length
+			const baseDelayMs = Math.min(Math.max(300, chunk.length * 20), 1200);
+
+			// Add some randomness to simulate human typing (±20%)
+			const randomFactor = 0.8 + Math.random() * 0.4; // 0.8 to 1.2
+			const delayMs = Math.round(baseDelayMs * randomFactor);
+
+			// Add the message after the delay
+			await addMessageWithDelay(
+				{
+					id: nextId++,
+					sender: 'other',
+					text: chunk
+				},
+				delayMs
+			);
+
+			// If this is not the last message, keep typing indicator
+			// and add a pause between messages
+			if (i < messageChunks.length - 1) {
+				// Add a small pause between messages (300-700ms)
+				const pauseMs = 300 + Math.random() * 400;
+				await new Promise((resolve) => setTimeout(resolve, pauseMs));
+			}
+		}
+
+		// Only turn off typing indicator when all messages are added
+		isTyping = false;
+	}
 
 	async function handleSend(userMessage: string) {
 		// Add user message to chat
@@ -37,41 +264,42 @@
 			}
 		];
 
-		// Set loading state
+		// Show typing indicator immediately
+		isTyping = true;
+
+		// Set loading state (internal)
 		isLoading = true;
 
 		try {
-			// Make API call to configured base URL
-			const apiUrl = `${PUBLIC_API_BASE_URL}/api/chat`;
-			const response = await fetch(apiUrl, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					message: userMessage,
-					// Send only the last 10 messages to keep the context manageable
-					history: messages.slice(-10)
-				})
-			});
+			// Send request directly to OpenAI
+			const reply = await sendChatRequest(
+				userMessage,
+				// Send only the last 10 messages to keep the context manageable
+				messages.slice(-10) as HistoryMessage[]
+			);
 
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
+			// Split the response into multiple messages if needed
+			const messageChunks = splitIntoMessages(reply);
+
+			// Set loading to false as we're now using typing indicator
+			isLoading = false;
+
+			// Add message chunks progressively with delays
+			await addMessagesProgressively(messageChunks);
+		} catch (error: unknown) {
+			console.error('Error calling OpenAI API:', error);
+
+			// Hide typing indicator on error
+			isTyping = false;
+
+			const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
+			// Check if it's an API key error
+			if (errorMessage.includes('API key')) {
+				apiKeyError = errorMessage;
+				// Force a recheck of the API key status
+				apiKeyConfigured = false;
 			}
-
-			const data = await response.json();
-
-			// Add AI response to chat
-			messages = [
-				...messages,
-				{
-					id: nextId++,
-					sender: 'other',
-					text: data.reply
-				}
-			];
-		} catch (error) {
-			console.error('Error calling chat API:', error);
 
 			// Add error message
 			messages = [
@@ -79,30 +307,13 @@
 				{
 					id: nextId++,
 					sender: 'system',
-					text: 'Failed to get a response. Please try again.'
+					text: 'Failed to get a response: ' + errorMessage
 				}
 			];
 		} finally {
 			isLoading = false;
-		}
-	}
-
-	// Function to fetch Axiom data and log to console
-	async function fetchAxiomData() {
-		try {
-			axiomDataStatus = 'Fetching data...';
-			const tokenData = await axiomService.getTokenData();
-
-			if (tokenData) {
-				console.log('Axiom Token Data:', tokenData);
-				axiomDataStatus = 'Data fetched successfully! Check the console.';
-			} else {
-				console.log('Not on an Axiom meme token page. URL must match axiom.trade/meme/{tokenId}');
-				axiomDataStatus = 'Not on an Axiom meme page. Must be on axiom.trade/meme/{tokenId}';
-			}
-		} catch (error) {
-			console.error('Error fetching Axiom data:', error);
-			axiomDataStatus = 'Error fetching data. Check console for details.';
+			// Note: isTyping is now managed in addMessagesProgressively
+			// and is set to false when done or in the catch block on error
 		}
 	}
 </script>
@@ -115,32 +326,40 @@
 				class="w-[288px] h-[30px] font-['Space_Mono'] font-bold text-[20px] leading-[30px] text-[#EED2FF] text-center"
 				style="text-shadow: 0px 0px 8px rgba(238, 210, 255, 0.7);"
 			>
-				Him
+				him
 			</h1>
 		</div>
 	</header>
 
-	<!-- Chat area (messages) -->
-	<ChatArea {messages} />
+	{#if !apiKeyConfigured}
+		<!-- API Key Setup UI -->
+		<div class="flex-1 flex items-center justify-center p-4">
+			{#if apiKeyError}
+				<div
+					class="text-red-400 text-sm mb-4 absolute top-[60px] p-2 bg-red-950/30 rounded border border-red-900/50"
+				>
+					{apiKeyError}
+				</div>
+			{/if}
+			<ApiKeySetup onComplete={() => (apiKeyConfigured = true)} />
+		</div>
+	{:else}
+		<!-- Chat area (messages) -->
+		<ChatArea {messages} {isTyping} />
 
-	<!-- Loading indicator (if needed) -->
-	{#if isLoading}
-		<div class="text-center text-sm text-[#EED2FF]/70 p-1">Thinking...</div>
+		<!-- Input area -->
+		<div class="relative">
+			{#if apiKeyError}
+				<div class="absolute bottom-full left-0 right-0 mb-2 flex justify-center">
+					<button
+						on:click={resetApiConfig}
+						class="text-sm text-red-400 bg-red-950/30 px-3 py-1 rounded border border-red-900/50"
+					>
+						API Key Error - Click to reconfigure
+					</button>
+				</div>
+			{/if}
+			<InputArea bind:value={currentInput} onsend={handleSend} disabled={isLoading || isTyping} />
+		</div>
 	{/if}
-
-	<!-- Input area -->
-	<InputArea bind:value={currentInput} onsend={handleSend} disabled={isLoading} />
-
-	<!-- Axiom Data Fetcher Button -->
-	<div class="p-2 mt-2 border-t border-gray-800">
-		<button
-			on:click={fetchAxiomData}
-			class="w-full py-2 px-4 bg-purple-800 hover:bg-purple-700 rounded text-sm text-white transition-colors"
-		>
-			Fetch Axiom Token Data
-		</button>
-		{#if axiomDataStatus}
-			<p class="text-xs mt-1 text-center text-gray-300">{axiomDataStatus}</p>
-		{/if}
-	</div>
 </div>

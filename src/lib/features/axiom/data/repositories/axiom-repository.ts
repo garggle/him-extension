@@ -1,7 +1,8 @@
 /**
  * Repository for handling Axiom token data
  */
-import { scrapeAxiomTokenData, type AxiomTokenData } from '../datasources/axiom-scraper.js';
+import type { AxiomTokenData } from '../../entities/token-data.js';
+import { scrapeAxiomTokenData } from '../datasources/axiom-scraper.js';
 
 /**
  * Repository class for accessing Axiom token data

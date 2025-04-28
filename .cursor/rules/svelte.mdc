@@ -21,7 +21,7 @@ alwaysApply: true
     "Proper state management with Runes",
     "Small, focused classes",
     "Performance-aware builds (image caching, list view optimization)",
-    "Make use of TDD to test business logic, UI, and integrations"
+    "Separate logic, markup and style"
   ],
   "PEDAC": {
     "plan": "When asked to plan or faced with a random prompt, follow the PEDA steps of the PEDAC method (Problem, Examples, Data structures, Algorithm).",

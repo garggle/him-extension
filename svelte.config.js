@@ -1,3 +1,4 @@
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 import adapter from 'sveltekit-adapter-chrome-extension';
 
 const config = {
@@ -10,8 +11,12 @@ const config = {
 			precompress: false,
 			manifest: 'manifest.json'
 		}),
-		appDir: 'app'
-	}
+		appDir: 'app',
+		alias: {
+			$lib: './src/lib'
+		}
+	},
+	preprocess: vitePreprocess()
 };
 
 export default config;

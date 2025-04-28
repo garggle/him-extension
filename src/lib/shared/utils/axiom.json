@@ -1,0 +1,219 @@
+{
+	"userTrading": {
+		"bought": "$0",
+		"sold": "$0",
+		"holding": "$0",
+		"pnl": "+$0 (+0%)",
+		"balance": "0"
+	},
+	"tokenInfo": {
+		"top10Holders": "13.6%",
+		"developerHolding": "0%",
+		"sniperHolding": "0%",
+		"insiderHoldings": "39.83%",
+		"bundlers": "10.35%",
+		"lpBurned": "100%",
+		"holders": "16652",
+		"proTraders": "1665",
+		"dexPaid": "paid"
+	},
+	"overall": {
+		"mcap": "$66.6M",
+		"price": "$0.067",
+		"liquidity": "$1.9M",
+		"totalSupply": "999M"
+	},
+	"timestamped": {
+		"volume": "$8.63K",
+		"buyers": "12",
+		"sellers": "19"
+	}
+}
+
+[
+    {
+        "timestamp": 1745841240,
+        "open": 0.0669301650784855,
+        "high": 0.0670145885778288,
+        "low": 0.0666773946385152,
+        "close": 0.0666773946385152,
+        "volume": 1299.21480894194
+    },
+    {
+        "timestamp": 1745841180,
+        "open": 0.0664935178283041,
+        "high": 0.0669301650784855,
+        "low": 0.0664935178283041,
+        "close": 0.0669301650784855,
+        "volume": 2106.21672797315
+    },
+    {
+        "timestamp": 1745841120,
+        "open": 0.0664378764647238,
+        "high": 0.0668188319924277,
+        "low": 0.0662010888393836,
+        "close": 0.0664935178283041,
+        "volume": 3251.16186867363
+    },
+    {
+        "timestamp": 1745841060,
+        "open": 0.0661291802565204,
+        "high": 0.0664378764647238,
+        "low": 0.0660864382387436,
+        "close": 0.0664378764647238,
+        "volume": 1018.52272649215
+    },
+    {
+        "timestamp": 1745841000,
+        "open": 0.0665033647480709,
+        "high": 0.0665033647480709,
+        "low": 0.0661291802565204,
+        "close": 0.0661291802565204,
+        "volume": 974.23583945175
+    },
+    {
+        "timestamp": 1745840940,
+        "open": 0.0664890532038295,
+        "high": 0.0665033647480709,
+        "low": 0.0661270573548684,
+        "close": 0.0665033647480709,
+        "volume": 2044.88161053748
+    },
+    {
+        "timestamp": 1745840880,
+        "open": 0.066227824126894,
+        "high": 0.0664890532038295,
+        "low": 0.066227824126894,
+        "close": 0.0664890532038295,
+        "volume": 30.13442288069
+    },
+]
+
+[
+    {
+        "timestamp": "2025-04-28T11:54:45Z",
+        "type": "sell",
+        "price": 1,
+        "amount": 0.216604975,
+        "txHash": "251FAxyhrt4D7urAEzdwxfoLZwNK6183RtLgiVibehXtPSZBKCnFaxpyVkucY62NAXVRhiVcJHBMUuHvCLbJG912"
+    },
+    {
+        "timestamp": "2025-04-28T11:54:44Z",
+        "type": "sell",
+        "price": 1,
+        "amount": 1.554840254,
+        "txHash": "5A4CFnfAP2dhYWGHbcUP92ZtC9rS3Zti94E4nLB7fRQW9cfSZ79xtV52ghQndU8ywxe9SWKd4SRLRu6e9vW6dPxr"
+    },
+    {
+        "timestamp": "2025-04-28T11:54:42Z",
+        "type": "buy",
+        "price": 0.000441077177230776,
+        "amount": 1132.366193,
+        "txHash": "31ZEjxKRy6ZDqLNFHaXMFQ5DYc8qeWjr1GRmwvDE7mXxxLA8hnvXHQNiRS7vTzqz6GG24R7GxbLgtSxPCgiCYtoA"
+    },
+    {
+        "timestamp": "2025-04-28T11:54:36Z",
+        "type": "sell",
+        "price": 1,
+        "amount": 1.816308371,
+        "txHash": "3tbAEda63bt2yabwGJijcVsJLyNQFZGR8TpHSksZnuQpMyb5xkX9h2UyuN6nS6miVwmaBUEGfWDZSdE4HZAPzC9"
+    },
+    {
+        "timestamp": "2025-04-28T11:54:08Z",
+        "type": "sell",
+        "price": 1,
+        "amount": 0.115677923,
+        "txHash": "4oCqv6fAxhaH7t3FNjBnz4Bc7CXkjXJWtKqRRAjwkEvpverfA6G7CMCtrV9nctFJBvK3k6vTy4xQiNQRayVqiH2h"
+    },
+    {
+        "timestamp": "2025-04-28T11:54:08Z",
+        "type": "sell",
+        "price": 1,
+        "amount": 0.104616084,
+        "txHash": "4XkjfAswaEuoQiVQX4w3HTECDNDEUWFG1ZNsK2djnKxhcDbehToHdLkAK3cZVKpPdA4srpi2oA2GmTHhhd1ZvTzn"
+    },
+    {
+        "timestamp": "2025-04-28T11:54:06Z",
+        "type": "buy",
+        "price": 0.000441030527001177,
+        "amount": 9622.023051,
+        "txHash": "2PWq737X7bfbeG8DADcSyLuVxAx6uZjFF5a8N9c4t8bEmEHxfMnXge9D8epT4QdBEApGgREW9czvMT65jKr7Ms7C"
+    },
+    {
+        "timestamp": "2025-04-28T11:53:58Z",
+        "type": "buy",
+        "price": 0.00044047492647901,
+        "amount": 8330.714784,
+        "txHash": "5CqPqHsSVQ8oM61Z8nwhvpPWPCq3y6LtMmYiad3wxrBmkUJxsYZFtUEdXjzoozVCi1GzL9TTBBb9sqGZTf8nutEW"
+    },
+    {
+        "timestamp": "2025-04-28T11:53:54Z",
+        "type": "sell",
+        "price": 1,
+        "amount": 0.834058515,
+        "txHash": "PVZJWEKH1bWJBGgcuMKynxwR464gNnUD84rbf9g9f72LP7aybEfMBHN7vv6KnyGiobrQodYwrBtbhhAkSkbngbQ"
+    },
+    {
+        "timestamp": "2025-04-28T11:53:17Z",
+        "type": "buy",
+        "price": 0.000439988058573646,
+        "amount": 11224.659101,
+        "txHash": "4qAp3DG3R14rgnB6iniuUU4NS4d6sJuDedFqKBfo3hUqbCcVs2EDheGGx73eNMK3xFSqWbCBN341ueGLYd2DKWB4"
+    },
+    {
+        "timestamp": "2025-04-28T11:53:15Z",
+        "type": "sell",
+        "price": 1,
+        "amount": 0.561162617,
+        "txHash": "3oqRQWDibdnapqcdXWBSfP2YP75n4v36yiWQfmeq1hbVmYPnotMaxxhvkmLjoNk1EfHA2btKBM7AHUeYEf9pspHD"
+    },
+    {
+        "timestamp": "2025-04-28T11:53:13Z",
+        "type": "buy",
+        "price": 0.000439671837731482,
+        "amount": 1591.284831,
+        "txHash": "4pgCmppYzn74uxbgTKiiHpAFrTnyWYeNBS7cYbRbBzmPFkELKUFKsKiszmHVnB53PzSq9889TXzPKPaU92dGb1EV"
+    },
+    {
+        "timestamp": "2025-04-28T11:53:09Z",
+        "type": "sell",
+        "price": 1,
+        "amount": 0.034419033,
+        "txHash": "4iuVKTb5zZdrB1YgNTa74JDDBP5KuGwcmEyZHyR5g9ws2AGbtxuRjfTJLZFfPFCxgVaVcGmC148YEa1g2GTtMgk4"
+    },
+    {
+        "timestamp": "2025-04-28T11:53:06Z",
+        "type": "sell",
+        "price": 1,
+        "amount": 0.000202889,
+        "txHash": "57Ryv8j5gG3sZYRFbxnHF83G884r18nk9MDektBrUXjsU7aqkAD5BaL6cdBazVWffaHNbKs6bzczM6bYr3KwNtc2"
+    },
+    {
+        "timestamp": "2025-04-28T11:53:01Z",
+        "type": "sell",
+        "price": 1,
+        "amount": 0.284343347,
+        "txHash": "5zHpy6guAHeb91JcSX29om33yWg8UZSJBM1xW67y6DZNM3aYCVEsbvDLwQnUubBKMeqByCm6bopGwzA3LDHjozSE"
+    },
+    {
+        "timestamp": "2025-04-28T11:53:01Z",
+        "type": "buy",
+        "price": 0.000439468563745467,
+        "amount": 6453.599149,
+        "txHash": "ujMUgA8zxJzfUVAuPmJnKo6GvGPPUkTPmioRHCTvczPVevPFydUV9LkdDMLWT3oyxi6ET8BR5pTQBreLiBa8Rsf"
+    },
+    {
+        "timestamp": "2025-04-28T11:52:59Z",
+        "type": "sell",
+        "price": 1,
+        "amount": 0.09158649,
+        "txHash": "58wrd69gxMQfdgarK3qii9vV6Ngd3jfn4qEJseVUb5br33Z41SiJ2Jehe72EppX8eR3LsbtGebzAKj1Va8Rrjw3Y"
+    },
+    {
+        "timestamp": "2025-04-28T11:52:59Z",
+        "type": "sell",
+        "price": 1,
+        "amount": 2.660877803,
+        "txHash": "5hyF3i3BtkieNKoGZRCdc6pW4CMwe6Vstm8BaKc3GnVEHjZrNAfU7cCqaKtpwAE6bVxyJm1nZC8v7SD5eownouqW"
+    },
+]

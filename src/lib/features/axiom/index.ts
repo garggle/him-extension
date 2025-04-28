@@ -5,8 +5,11 @@
 // Export the service for direct use
 export { axiomService } from './application/axiom-service.js';
 
-// Export the UI component
-export { default as AxiomDataFetcher } from './ui/blocks/AxiomDataFetcher.svelte';
-
-// Export the token data type for type safety
-export type { AxiomTokenData } from './data/datasources/axiom-scraper.js';
+// Export entities
+export {
+	AxiomTokenData,
+	OverallData,
+	TimestampedData,
+	TokenInfoData,
+	UserTradingData
+} from './entities/token-data.js';
