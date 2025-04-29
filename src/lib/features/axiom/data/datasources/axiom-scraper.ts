@@ -65,6 +65,7 @@ type RawAxiomData = {
 		holders: string | null;
 		proTraders: string | null;
 		dexPaid: string | null;
+		contractAge: string | null;
 	};
 	overall: {
 		mcap: string | null;
@@ -76,6 +77,8 @@ type RawAxiomData = {
 		volume: string | null;
 		buyers: string | null;
 		sellers: string | null;
+		timeframe: string | null;
+		netVolume: string | null;
 	};
 };
 
@@ -125,6 +128,10 @@ async function scrapeDataFromActiveTab(): Promise<AxiomTokenData | null> {
 						'/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[1]/div[2]/div/div[1]/div[2]/div/span[1]',
 					currentTimeScaleSellers:
 						'/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[1]/div[2]/div/div[1]/div[3]/div/span[1]',
+					timeframe:
+						'/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[1]/div[2]/div/div[1]/div[1]/span[1]',
+					contractAge:
+						'/html[1]/body[1]/div[1]/div[3]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[2]/div[2]/span[1]',
 					price:
 						'/html/body/div[1]/div[3]/div/div/div/div/div[1]/div[1]/div/div[1]/div[2]/div/div[3]/div/span',
 					liquidity:
@@ -224,7 +231,8 @@ async function scrapeDataFromActiveTab(): Promise<AxiomTokenData | null> {
 						lpBurned: flatData.lpBurned,
 						holders: flatData.holders,
 						proTraders: flatData.proTraders,
-						dexPaid: flatData.dexPaid
+						dexPaid: flatData.dexPaid,
+						contractAge: flatData.contractAge
 					},
 					overall: {
 						mcap: flatData.mcap,
@@ -235,7 +243,9 @@ async function scrapeDataFromActiveTab(): Promise<AxiomTokenData | null> {
 					timestamped: {
 						volume: flatData.currentTimeScaleVolume,
 						buyers: flatData.currentTimeScaleBuyers,
-						sellers: flatData.currentTimeScaleSellers
+						sellers: flatData.currentTimeScaleSellers,
+						timeframe: flatData.timeframe,
+						netVolume: flatData.currentTimeScaleVolume
 					}
 				};
 

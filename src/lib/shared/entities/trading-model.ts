@@ -34,6 +34,8 @@ export type Snapshot = {
 		volume: string;
 		buyers: string;
 		sellers: string;
+		timeframe: string;
+		netVolume: string;
 	};
 };
 

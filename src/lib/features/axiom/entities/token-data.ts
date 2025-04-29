@@ -92,7 +92,61 @@ export class OverallData {
 		liquidity: string | null;
 		totalSupply: string | null;
 	}): OverallData {
-		return new OverallData(data.mcap, data.price, data.liquidity, data.totalSupply);
+		// Format the price before creating the instance
+		const formattedData = {
+			...data,
+			price: this.formatPrice(data.price)
+		};
+
+		return new OverallData(
+			formattedData.mcap,
+			formattedData.price,
+			formattedData.liquidity,
+			formattedData.totalSupply
+		);
+	}
+
+	/**
+	 * Formats the price string according to the rule:
+	 * The first digit between 1-9 represents the number of zeros after decimal point
+	 * @param price The raw price string
+	 * @returns The formatted price string
+	 */
+	private static formatPrice(price: string | null): string | null {
+		if (!price) return price;
+
+		try {
+			// Extract currency symbol if present
+			const currencySymbol = price.match(/[$€£¥]/)?.[0] || '';
+
+			// Clean the price string, keeping only digits and dots
+			const numericPart = price.replace(/[^0-9.]/g, '');
+			if (!numericPart) return price;
+
+			// Find the first digit between 1-9
+			const match = numericPart.match(/[1-9]/);
+			if (!match) return price; // Return original if no digit found
+
+			// Get the digit for number of zeros
+			const zeroCount = parseInt(match[0]);
+
+			// Remove the first occurrence of this digit from the numeric part
+			// We need to escape it since it might be a special regex character
+			const escapedDigit = match[0].replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+			const otherDigits = numericPart.replace(new RegExp(escapedDigit, 'u'), '');
+
+			// Remove any existing decimal points
+			const cleanDigits = otherDigits.replace(/\./g, '');
+
+			// Format with the correct number of zeros after decimal point
+			const formattedPrice = `0.${'0'.repeat(zeroCount - 1)}${cleanDigits}`;
+
+			// Add back currency symbol
+			return `${currencySymbol}${formattedPrice}`;
+		} catch (error) {
+			console.error('Error formatting price:', error);
+			return price; // Return original price on error
+		}
 	}
 }
 
@@ -103,7 +157,9 @@ export class TimestampedData {
 	constructor(
 		public readonly volume: string | null,
 		public readonly buyers: string | null,
-		public readonly sellers: string | null
+		public readonly sellers: string | null,
+		public readonly netVolume: string | null,
+		public readonly timeframe: string | null
 	) {}
 
 	/**
@@ -113,8 +169,16 @@ export class TimestampedData {
 		volume: string | null;
 		buyers: string | null;
 		sellers: string | null;
+		netVolume: string | null;
+		timeframe: string | null;
 	}): TimestampedData {
-		return new TimestampedData(data.volume, data.buyers, data.sellers);
+		return new TimestampedData(
+			data.volume,
+			data.buyers,
+			data.sellers,
+			data.netVolume,
+			data.timeframe
+		);
 	}
 }
 
@@ -161,6 +225,8 @@ export class AxiomTokenData {
 			volume: string | null;
 			buyers: string | null;
 			sellers: string | null;
+			netVolume: string | null;
+			timeframe: string | null;
 		};
 	}): AxiomTokenData {
 		return new AxiomTokenData(

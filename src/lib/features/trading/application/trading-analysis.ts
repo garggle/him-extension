@@ -47,7 +47,9 @@ export function convertAxiomDataToSnapshot(axiomData: AxiomTokenData): Snapshot 
 		timestamped: {
 			volume: axiomData.timestamped.volume || '0',
 			buyers: axiomData.timestamped.buyers || '0',
-			sellers: axiomData.timestamped.sellers || '0'
+			sellers: axiomData.timestamped.sellers || '0',
+			timeframe: axiomData.timestamped.timeframe || '1h',
+			netVolume: axiomData.timestamped.netVolume || '0'
 		}
 	};
 }

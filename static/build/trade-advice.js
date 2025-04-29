@@ -85,7 +85,7 @@ async function sendChatRequest(message, history = []) {
         Authorization: `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: "gpt-4o",
+        model: "gpt-4.1",
         messages
       })
     });
@@ -108,32 +108,70 @@ async function sendChatRequest(message, history = []) {
 }
 
 // src/lib/features/chat/data/trading-analyzer.ts
-function formatAnalysisPrompt(analysisResult, snapshot) {
+function getReadableFactorName(factorKey) {
+  const factorNames = {
+    momentum: "Momentum",
+    volumeTrend: "Volume Trend",
+    flowImbalance: "Buy/Sell Flow",
+    liquidityScore: "Liquidity",
+    whaleRisk: "Whale Risk",
+    rsi: "RSI",
+    volatility: "Volatility",
+    vwapDeviation: "VWAP Deviation",
+    volatilityAdjustedMomentum: "Risk-Adjusted Momentum"
+  };
+  return factorNames[factorKey];
+}
+function formatEnhancedAnalysisPrompt(enhancedResult, snapshot) {
+  const { modelResult, manipulationWarnings, manipulationScore } = enhancedResult;
+  const { decision, score, normalizedFactors, factorContributions } = modelResult;
   let prompt = `Analyze this token trading opportunity:
 
-MODEL RECOMMENDATION: ${analysisResult.decision} (Score: ${analysisResult.score.toFixed(2)})
+MODEL RECOMMENDATION: ${decision} (Score: ${score.toFixed(2)})
 
-KEY INDICATORS:
-- Momentum: ${analysisResult.factors.momentum.toFixed(2)} (${getIndicatorStatus(analysisResult.factors.momentum)})
-- Volume Trend: ${analysisResult.factors.volumeTrend.toFixed(2)} (${getIndicatorStatus(analysisResult.factors.volumeTrend)})
-- Buy/Sell Flow: ${analysisResult.factors.flowRatio.toFixed(2)} (${getIndicatorStatus(analysisResult.factors.flowRatio)})
-- Liquidity Score: ${analysisResult.factors.liquidityScore.toFixed(2)} (${getIndicatorStatus(analysisResult.factors.liquidityScore, true)})
-- Whale Risk: ${analysisResult.factors.whaleRisk.toFixed(2)} (${getIndicatorStatus(-analysisResult.factors.whaleRisk)})`;
+KEY INDICATORS:`;
+  Object.keys(normalizedFactors).forEach((key) => {
+    const value = normalizedFactors[key];
+    const contribution = factorContributions[key];
+    const isPositiveOnly = key === "liquidityScore";
+    const isNegativeBetter = key === "whaleRisk";
+    const status = getIndicatorStatus(isNegativeBetter ? -value : value, isPositiveOnly);
+    prompt += `
+- ${getReadableFactorName(key)}: ${value.toFixed(2)} (${status}, Impact: ${(contribution * 100).toFixed(1)}%)`;
+  });
+  if (manipulationWarnings.length > 0 || manipulationScore > 0) {
+    prompt += `
+
+MANIPULATION ANALYSIS:
+- Risk Score: ${manipulationScore.toFixed(2)} (${getManipulationLevel(manipulationScore)})`;
+    if (manipulationWarnings.length > 0) {
+      prompt += `
+- Warnings: ${manipulationWarnings.join("; ")}`;
+    }
+  }
   if (snapshot) {
     prompt += `
 
 TOKEN METRICS:
 - Market Cap: ${snapshot.overall.mcap}
-- Price: ${snapshot.overall.price}
+- Price: ${snapshot.overall.price} (1st number which is not 0 after decimal point means the number of 0 after decimal point)
 - Liquidity: ${snapshot.overall.liquidity}
 - Volume: ${snapshot.timestamped.volume}
-- Buyers/Sellers: ${snapshot.timestamped.buyers}/${snapshot.timestamped.sellers}
-- Top 10 Holders: ${snapshot.tokenInfo.top10Holders}
-- Insider Holdings: ${snapshot.tokenInfo.insiderHoldings}`;
+- Net Volume: ${snapshot.timestamped.netVolume} in last ${snapshot.timestamped.timeframe}
+- Buyers/Sellers: ${snapshot.timestamped.buyers}/${snapshot.timestamped.sellers} in last ${snapshot.timestamped.timeframe}
+- Top 10 Holders %: ${snapshot.tokenInfo.top10Holders}
+- Insider Holdings %: ${snapshot.tokenInfo.insiderHoldings}
+- Developer Holdings %: ${snapshot.tokenInfo.developerHolding}
+- Sniper Holdings %: ${snapshot.tokenInfo.sniperHolding}
+- Bundlers %: ${snapshot.tokenInfo.bundlers}
+- LP Burned %: ${snapshot.tokenInfo.lpBurned}
+- Holders: ${snapshot.tokenInfo.holders}
+- Pro Traders: ${snapshot.tokenInfo.proTraders}
+- Dexscreener Paid: ${snapshot.tokenInfo.dexPaid}`;
   }
   prompt += `
 
-Based on these indicators and metrics, what should I do on this SOLANA memecoin? Give me very practical memecoin trading advice in a natural, conversational tone. Consider risk levels, timing, and potential strategies. First give what I should do, then explain why. But be concise. Don't use more than 15 sentences.`;
+Based on these indicators, metrics, and manipulation analysis, what should I do on this SOLANA memecoin? Give me very practical memecoin trading advice in a natural, conversational tone. Give numbers and percentages to aim for PnL, Stop Loss, Take Profit. Consider risk levels, timing, and potential strategies. First give what I should do, then explain why. But be concise. Produce 5 sentences or less. No newlines. Make the first message start with "Action:"`;
   return prompt;
 }
 function getIndicatorStatus(value, isPositiveOnly = false) {
@@ -157,15 +195,25 @@ function getIndicatorStatus(value, isPositiveOnly = false) {
     return "Bearish";
   }
 }
-async function getTradeAdvice(analysisResult, snapshot) {
+function getManipulationLevel(score) {
+  if (score < 0.2)
+    return "Low";
+  if (score < 0.5)
+    return "Moderate";
+  if (score < 0.8)
+    return "High";
+  return "Extreme";
+}
+async function getEnhancedTradeAdvice(enhancedResult, snapshot) {
   try {
-    const prompt = formatAnalysisPrompt(analysisResult, snapshot);
+    const prompt = formatEnhancedAnalysisPrompt(enhancedResult, snapshot);
     return await sendChatRequest(prompt, []);
   } catch (error) {
-    console.error("Error getting trade advice:", error);
+    console.error("Error getting enhanced trade advice:", error);
     throw error;
   }
 }
 export {
-  getTradeAdvice
+  getEnhancedTradeAdvice,
+  getEnhancedTradeAdvice as getTradeAdvice
 };

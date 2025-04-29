@@ -197,6 +197,10 @@ function scrapeAxiomData() {
 			'/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[1]/div[2]/div/div[1]/div[2]/div/span[1]',
 		currentTimeScaleSellers:
 			'/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[1]/div[2]/div/div[1]/div[3]/div/span[1]',
+		timeframe:
+			'/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[1]/div[2]/div/div[1]/div[1]/span[1]',
+		contractAge:
+			'/html[1]/body[1]/div[1]/div[3]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[2]/div[2]/span[1]',
 		price:
 			'/html/body/div[1]/div[3]/div/div/div/div/div[1]/div[1]/div/div[1]/div[2]/div/div[3]/div/span',
 		liquidity:
@@ -230,6 +234,49 @@ function scrapeAxiomData() {
 		}
 	}
 
+	/**
+	 * Formats the price string according to the rule:
+	 * The first digit between 1-9 represents the number of zeros after decimal point
+	 * @param price The raw price string
+	 * @returns The formatted price string
+	 */
+	function formatPrice(price) {
+		if (!price) return price;
+
+		try {
+			// Extract currency symbol if present
+			const currencySymbol = price.match(/[$€£¥]/)?.[0] || '';
+
+			// Clean the price string, keeping only digits and dots
+			const numericPart = price.replace(/[^0-9.]/g, '');
+			if (!numericPart) return price;
+
+			// Find the first digit between 1-9
+			const match = numericPart.match(/[1-9]/);
+			if (!match) return price; // Return original if no digit found
+
+			// Get the digit for number of zeros
+			const zeroCount = parseInt(match[0]);
+
+			// Remove the first occurrence of this digit from the numeric part
+			// We need to escape it since it might be a special regex character
+			const escapedDigit = match[0].replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+			const otherDigits = numericPart.replace(new RegExp(escapedDigit), '');
+
+			// Remove any existing decimal points
+			const cleanDigits = otherDigits.replace(/\./g, '');
+
+			// Format with the correct number of zeros after decimal point
+			const formattedPrice = `0.${'0'.repeat(zeroCount - 2)}${cleanDigits}`;
+
+			// Add back currency symbol
+			return `${currencySymbol}${formattedPrice}`;
+		} catch (error) {
+			console.error('Error formatting price:', error);
+			return price; // Return original price on error
+		}
+	}
+
 	// 1. Scrape all data into a flat structure first
 	const flatData = {};
 	for (const [dataKey, xpath] of Object.entries(XPATH_CONFIG)) {
@@ -254,18 +301,21 @@ function scrapeAxiomData() {
 			lpBurned: flatData.lpBurned,
 			holders: flatData.holders,
 			proTraders: flatData.proTraders,
-			dexPaid: flatData.dexPaid
+			dexPaid: flatData.dexPaid,
+			contractAge: flatData.contractAge
 		},
 		overall: {
 			mcap: flatData.mcap,
-			price: flatData.price,
+			price: formatPrice(flatData.price),
 			liquidity: flatData.liquidity,
 			totalSupply: flatData.totalSupply
 		},
 		timestamped: {
 			volume: flatData.currentTimeScaleVolume,
+			netVolume: flatData.currentTimeScaleVolume,
 			buyers: flatData.currentTimeScaleBuyers,
-			sellers: flatData.currentTimeScaleSellers
+			sellers: flatData.currentTimeScaleSellers,
+			timeframe: flatData.timeframe
 		}
 	};
 }
@@ -276,7 +326,7 @@ async function fetchGeckoTerminalData(poolAddress, network = 'solana') {
 
 	try {
 		// Define API endpoints
-		const ohlcvUrl = `${GECKO_API_BASE_URL}/networks/${network}/pools/${poolAddress}/ohlcv/minute`;
+		const ohlcvUrl = `${GECKO_API_BASE_URL}/networks/${network}/pools/${poolAddress}/ohlcv/minute?limit=1000`;
 		const tradesUrl = `${GECKO_API_BASE_URL}/networks/${network}/pools/${poolAddress}/trades`;
 
 		console.log('Fetching GeckoTerminal data:', { ohlcvUrl, tradesUrl });

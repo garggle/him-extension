@@ -1,10 +1,9 @@
 /**
- * Simple utility to split messages into smaller chunks
- * Optimized for small-caps messages
+ * Simple utility to split messages into smaller chunks based on dots followed by spaces
  */
 
 /**
- * Splits a text into multiple message chunks
+ * Splits a text into multiple message chunks at each dot followed by a space
  *
  * @param text The text to split
  * @returns An array of message chunks
@@ -21,72 +20,18 @@ export function splitIntoMessages(text: string): string[] {
 		return [trimmedText];
 	}
 
-	// Handle line breaks first - each line becomes a separate message
-	if (trimmedText.includes('\n')) {
-		return trimmedText
-			.split('\n')
-			.map((line) => line.trim())
-			.filter((line) => line.length > 0);
-	}
+	// Split text at every dot followed by a space
+	const chunks = trimmedText.split('. ');
 
-	// Simple sentence splitting for small-caps messages
-	return splitIntoSentences(trimmedText);
-}
-
-/**
- * Splits text into sentences using simple punctuation rules
- */
-function splitIntoSentences(text: string): string[] {
-	// Basic sentence ending patterns
-	const sentenceEndRegex = /[.!?](?=\s|$)/g;
-
-	// If no sentence endings found, try fallback splitting
-	if (!sentenceEndRegex.test(text)) {
-		return fallbackSplitting(text);
-	}
-
-	// Reset regex state
-	sentenceEndRegex.lastIndex = 0;
-
-	const sentences: string[] = [];
-	let lastIndex = 0;
-	let match;
-
-	// Extract sentences
-	while ((match = sentenceEndRegex.exec(text)) !== null) {
-		const sentence = text.substring(lastIndex, match.index + 1).trim();
-		if (sentence) {
-			sentences.push(sentence);
-		}
-		lastIndex = match.index + 1;
-
-		// Skip spaces after sentence end
-		while (lastIndex < text.length && /\s/.test(text[lastIndex])) {
-			lastIndex++;
-		}
-	}
-
-	// Add remaining text if any
-	if (lastIndex < text.length) {
-		const remaining = text.substring(lastIndex).trim();
-		if (remaining) {
-			sentences.push(remaining);
-		}
-	}
-
-	return sentences;
-}
-
-/**
- * Fallback splitting method using simple delimiters
- */
-function fallbackSplitting(text: string): string[] {
-	// Try to split by common punctuation
-	const byPunctuation = text.split(/[,;:](?=\s)/);
-	if (byPunctuation.length > 1) {
-		return byPunctuation.map((s) => s.trim()).filter((s) => s.length > 0);
-	}
-
-	// If we still don't have multiple segments, just return the whole text
-	return [text];
+	// Process the chunks to handle the final period
+	return chunks
+		.map((chunk, index, array) => {
+			// For all chunks except the last one, add the period back
+			if (index < array.length - 1) {
+				return chunk + '.';
+			}
+			// For the last chunk, only add period if the original text ended with a period
+			return trimmedText.endsWith('.') && !chunk.endsWith('.') ? chunk + '.' : chunk;
+		})
+		.filter((chunk) => chunk.trim().length > 0);
 }

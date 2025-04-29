@@ -69,11 +69,7 @@
 						{
 							id: nextId++,
 							sender: 'system',
-							text: `Analysis for ${tokenName || 'Unknown Token'}:
-Price: ${tokenData?.price || 'N/A'}
-Market Cap: ${tokenData?.mcap || 'N/A'}
-Liquidity: ${tokenData?.liquidity || 'N/A'}
-Model: ${tokenData?.decision || 'N/A'} (Score: ${tokenData?.score?.toFixed(2) || 'N/A'})`
+							text: `analysis for \$${tokenName || 'error'}:\nprice: ${tokenData?.price || 'N/A'}\nmcap: ${tokenData?.mcap || 'N/A'}\nliquidity: ${tokenData?.liquidity || 'N/A'}`
 						}
 					];
 
@@ -108,11 +104,7 @@ Model: ${tokenData?.decision || 'N/A'} (Score: ${tokenData?.score?.toFixed(2) ||
 						{
 							id: nextId++,
 							sender: 'system',
-							text: `Analysis for ${tokenName || 'Unknown Token'}:
-Price: ${tokenData?.price || 'N/A'}
-Market Cap: ${tokenData?.mcap || 'N/A'}
-Liquidity: ${tokenData?.liquidity || 'N/A'}
-Model: ${tokenData?.decision || 'N/A'} (Score: ${tokenData?.score?.toFixed(2) || 'N/A'})`
+							text: `analysis for \$${tokenName || 'error'}:\nprice: ${tokenData?.price || 'N/A'}\nmcap: ${tokenData?.mcap || 'N/A'}\nliquidity: ${tokenData?.liquidity || 'N/A'}`
 						}
 					];
 
