@@ -6,7 +6,10 @@
 		sendChatRequest,
 		type HistoryMessage
 	} from '$lib/features/chat/data/openai-api.js';
-	import { getTradeAdvice } from '$lib/features/chat/data/trading-analyzer.js';
+	import {
+		getTradeAdvice,
+		type TradingAdviceCards
+	} from '$lib/features/chat/data/trading-analyzer.js';
 	import InputArea from '$lib/features/chat/InputArea.svelte';
 	import { splitIntoMessages } from '$lib/shared/utils/message-splitter.js';
 	import { onMount } from 'svelte';
@@ -69,18 +72,46 @@
 						{
 							id: nextId++,
 							sender: 'system',
-							text: `analysis for \$${tokenName || 'error'}:\nprice: ${tokenData?.price || 'N/A'}\nmcap: ${tokenData?.mcap || 'N/A'}\nliquidity: ${tokenData?.liquidity || 'N/A'}`
+							text: `Analysis for \$${tokenName || 'error'}:\nMCap: ${tokenData?.mcap || 'N/A'} Liq: ${tokenData?.liquidity || 'N/A'}`
 						}
 					];
 
 					// Add the AI advice message with fake typing
 					isTyping = true;
 
-					// Split the advice into chunks for more natural display
-					const messageChunks = splitIntoMessages(message);
+					try {
+						// Try to parse the message as JSON
+						let adviceObject;
+						if (typeof message === 'string') {
+							adviceObject = JSON.parse(message);
+						} else {
+							adviceObject = message; // Already an object
+						}
 
-					// Add message chunks progressively with delays
-					await addMessagesProgressively(messageChunks);
+						// Check if it's our new card format or legacy format
+						if (adviceObject.actionStrategy && adviceObject.finalCall) {
+							// New card format - create formatted messages from cards
+							const cardMessages = formatCardMessages(adviceObject);
+							await addMessagesProgressively(cardMessages);
+						} else if (adviceObject.legacyFormat && adviceObject.text) {
+							// Legacy format but wrapped in our compatibility object
+							const messageChunks = splitIntoMessages(adviceObject.text);
+							await addMessagesProgressively(messageChunks);
+						} else {
+							// Plain text or unknown format, try to use as is
+							const messageChunks = splitIntoMessages(
+								typeof message === 'string' ? message : JSON.stringify(message)
+							);
+							await addMessagesProgressively(messageChunks);
+						}
+					} catch (error) {
+						console.error('Error processing advice format:', error);
+						// Fallback to treating as plain text
+						const messageChunks = splitIntoMessages(
+							typeof message === 'string' ? message : JSON.stringify(message)
+						);
+						await addMessagesProgressively(messageChunks);
+					}
 
 					// Clear the stored advice to prevent showing it again
 					await chrome.storage.session.remove('tradeAdvice');
@@ -104,18 +135,46 @@
 						{
 							id: nextId++,
 							sender: 'system',
-							text: `analysis for \$${tokenName || 'error'}:\nprice: ${tokenData?.price || 'N/A'}\nmcap: ${tokenData?.mcap || 'N/A'}\nliquidity: ${tokenData?.liquidity || 'N/A'}`
+							text: `Analysis for \$${tokenName || 'error'}:\nMCap: ${tokenData?.mcap || 'N/A'} Liq: ${tokenData?.liquidity || 'N/A'}`
 						}
 					];
 
 					// Add the AI advice message with fake typing
 					isTyping = true;
 
-					// Split the advice into chunks for more natural display
-					const messageChunks = splitIntoMessages(advice);
+					try {
+						// Try to parse the advice as JSON
+						let adviceObject;
+						if (typeof advice === 'string') {
+							adviceObject = JSON.parse(advice);
+						} else {
+							adviceObject = advice; // Already an object
+						}
 
-					// Add message chunks progressively with delays
-					await addMessagesProgressively(messageChunks);
+						// Check if it's our new card format or legacy format
+						if (adviceObject.actionStrategy && adviceObject.finalCall) {
+							// New card format - create formatted messages from cards
+							const cardMessages = formatCardMessages(adviceObject);
+							await addMessagesProgressively(cardMessages);
+						} else if (adviceObject.legacyFormat && adviceObject.text) {
+							// Legacy format but wrapped in our compatibility object
+							const messageChunks = splitIntoMessages(adviceObject.text);
+							await addMessagesProgressively(messageChunks);
+						} else {
+							// Plain text or unknown format, try to use as is
+							const messageChunks = splitIntoMessages(
+								typeof advice === 'string' ? advice : JSON.stringify(advice)
+							);
+							await addMessagesProgressively(messageChunks);
+						}
+					} catch (error) {
+						console.error('Error processing advice format:', error);
+						// Fallback to treating as plain text
+						const messageChunks = splitIntoMessages(
+							typeof advice === 'string' ? advice : JSON.stringify(advice)
+						);
+						await addMessagesProgressively(messageChunks);
+					}
 				}
 			}
 		});
@@ -209,39 +268,19 @@
 	 * Add messages progressively with delay between each
 	 */
 	async function addMessagesProgressively(messageChunks: string[]) {
-		// Note: isTyping is already set to true in handleSend
+		// Note: isTyping is already set to true before this function is called
 
-		// Process each message chunk
-		for (let i = 0; i < messageChunks.length; i++) {
-			const chunk = messageChunks[i];
+		// Create all message objects immediately
+		const newMessages = messageChunks.map((chunk) => ({
+			id: nextId++,
+			sender: 'other' as 'self' | 'other' | 'system',
+			text: chunk
+		}));
 
-			// Calculate a base delay based on message length
-			const baseDelayMs = Math.min(Math.max(300, chunk.length * 20), 1200);
+		// Add all new messages to the state at once
+		messages = [...messages, ...newMessages];
 
-			// Add some randomness to simulate human typing (±20%)
-			const randomFactor = 0.8 + Math.random() * 0.4; // 0.8 to 1.2
-			const delayMs = Math.round(baseDelayMs * randomFactor);
-
-			// Add the message after the delay
-			await addMessageWithDelay(
-				{
-					id: nextId++,
-					sender: 'other',
-					text: chunk
-				},
-				delayMs
-			);
-
-			// If this is not the last message, keep typing indicator
-			// and add a pause between messages
-			if (i < messageChunks.length - 1) {
-				// Add a small pause between messages (300-700ms)
-				const pauseMs = 300 + Math.random() * 400;
-				await new Promise((resolve) => setTimeout(resolve, pauseMs));
-			}
-		}
-
-		// Only turn off typing indicator when all messages are added
+		// Turn off typing indicator now that all messages are added
 		isTyping = false;
 	}
 
@@ -307,6 +346,53 @@
 			// Note: isTyping is now managed in addMessagesProgressively
 			// and is set to false when done or in the catch block on error
 		}
+	}
+
+	// Format the cards into message chunks
+	function formatCardMessages(cards: TradingAdviceCards): string[] {
+		const messages: string[] = [];
+
+		// Action Strategy card
+		let actionMessage = `${cards.actionStrategy.header}\n`;
+		actionMessage += `Entry: ${cards.actionStrategy.body.entry}\n`;
+		actionMessage += `TP/SL: ${cards.actionStrategy.body.tp_sl}\n`;
+		actionMessage += `Timeframe: ${cards.actionStrategy.body.timeframe}\n`;
+		actionMessage += `Reason: ${cards.actionStrategy.body.reason}`;
+		messages.push(actionMessage);
+
+		// Liquidity card
+		let liquidityMessage = `${cards.liquidityPump.header}\n`;
+		liquidityMessage += `Liquidity: ${cards.liquidityPump.body.liquidity}\n`;
+		liquidityMessage += `Volume: ${cards.liquidityPump.body.net_volume}\n`;
+		liquidityMessage += `Buyers/Sellers: ${cards.liquidityPump.body.buyer_seller_ratio}\n`;
+		liquidityMessage += `${cards.liquidityPump.body.interpretation}`;
+		messages.push(liquidityMessage);
+
+		// Holder Structure card
+		let holderMessage = `${cards.holderStructure.header}\n`;
+		holderMessage += `Holders: ${cards.holderStructure.body.holders}\n`;
+		holderMessage += `Pro traders: ${cards.holderStructure.body.pro_traders}\n`;
+		holderMessage += `Top 10: ${cards.holderStructure.body.top_10_pct}\n`;
+		holderMessage += `${cards.holderStructure.body.interpretation}`;
+		messages.push(holderMessage);
+
+		// Manipulation Risk card
+		let riskMessage = `${cards.manipulationRisk.header}\n`;
+		riskMessage += `Insider: ${cards.manipulationRisk.body.insider_pct}\n`;
+		riskMessage += `Dev: ${cards.manipulationRisk.body.dev_pct}\n`;
+		riskMessage += `Snipers: ${cards.manipulationRisk.body.snipers_pct}\n`;
+		riskMessage += `LP Burned: ${cards.manipulationRisk.body.lp_burned_pct}\n`;
+		riskMessage += `Bundlers: ${cards.manipulationRisk.body.bundlers_pct}\n`;
+		riskMessage += `${cards.manipulationRisk.body.interpretation}`;
+		messages.push(riskMessage);
+
+		// Final Call card
+		let finalMessage = `${cards.finalCall.header}\n`;
+		finalMessage += `Based on: ${cards.finalCall.body.based_on.join(', ')}\n`;
+		finalMessage += `${cards.finalCall.body.text}`;
+		messages.push(finalMessage);
+
+		return messages;
 	}
 </script>
 

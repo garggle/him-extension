@@ -1,0 +1,357 @@
+{
+	"name": "trading_cards",
+	"schema": {
+		"type": "object",
+		"properties": {
+			"cards": {
+				"type": "array",
+				"description": "A list of trading cards providing different analyses.",
+				"items": {
+					"anyOf": [
+						{
+							"$ref": "#/$defs/strategy_card"
+						},
+						{
+							"$ref": "#/$defs/liquidity_card"
+						},
+						{
+							"$ref": "#/$defs/holder_card"
+						},
+						{
+							"$ref": "#/$defs/manipulation_card"
+						},
+						{
+							"$ref": "#/$defs/final_call_card"
+						}
+					]
+				}
+			},
+			"snapshot": {
+				"type": "object",
+				"properties": {
+					"overall": {
+						"type": "object",
+						"properties": {
+							"mcap": {
+								"type": "string",
+								"description": "Market capitalization of the token."
+							},
+							"price": {
+								"type": "string",
+								"description": "Current price of the token."
+							},
+							"liquidity": {
+								"type": "string",
+								"description": "Liquidity available for the token."
+							}
+						},
+						"required": ["mcap", "price", "liquidity"],
+						"additionalProperties": false
+					},
+					"timestamped": {
+						"type": "object",
+						"properties": {
+							"volume": {
+								"type": "string",
+								"description": "Volume of trades within a specific timeframe."
+							},
+							"netVolume": {
+								"type": "string",
+								"description": "Net volume of trades in the last specified timeframe."
+							},
+							"buyers": {
+								"type": "string",
+								"description": "Number of buyers in the last specified timeframe."
+							},
+							"sellers": {
+								"type": "string",
+								"description": "Number of sellers in the last specified timeframe."
+							},
+							"timeframe": {
+								"type": "string",
+								"description": "The time frame in which the volume and buyers/sellers are measured."
+							}
+						},
+						"required": ["volume", "netVolume", "buyers", "sellers", "timeframe"],
+						"additionalProperties": false
+					},
+					"tokenInfo": {
+						"type": "object",
+						"properties": {
+							"top10Holders": {
+								"type": "string",
+								"description": "Percentage of top 10 holders."
+							},
+							"insiderHoldings": {
+								"type": "string",
+								"description": "Percentage of insider holdings."
+							},
+							"developerHolding": {
+								"type": "string",
+								"description": "Percentage of developer holdings."
+							},
+							"sniperHolding": {
+								"type": "string",
+								"description": "Percentage of sniper holdings."
+							},
+							"bundlers": {
+								"type": "string",
+								"description": "Percentage of bundlers."
+							},
+							"lpBurned": {
+								"type": "string",
+								"description": "Percentage of LP burned."
+							},
+							"holders": {
+								"type": "number",
+								"description": "Number of total holders."
+							},
+							"proTraders": {
+								"type": "number",
+								"description": "Number of professional traders."
+							},
+							"dexPaid": {
+								"type": "string",
+								"description": "Indicates if the Dexscreener is paid."
+							}
+						},
+						"required": [
+							"top10Holders",
+							"insiderHoldings",
+							"developerHolding",
+							"sniperHolding",
+							"bundlers",
+							"lpBurned",
+							"holders",
+							"proTraders",
+							"dexPaid"
+						],
+						"additionalProperties": false
+					}
+				},
+				"required": ["overall", "timestamped", "tokenInfo"],
+				"additionalProperties": false
+			},
+			"trading_advice": {
+				"type": "string",
+				"description": "Concise trading advice based on the analysis."
+			}
+		},
+		"required": ["cards", "snapshot", "trading_advice"],
+		"additionalProperties": false,
+		"$defs": {
+			"strategy_card": {
+				"type": "object",
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": ["strategy"]
+					},
+					"header": {
+						"type": "string",
+						"description": "The header of the strategy card."
+					},
+					"entry": {
+						"type": "string",
+						"description": "Entry point for the strategy."
+					},
+					"tp_sl": {
+						"type": "string",
+						"description": "Take profit and stop loss levels."
+					},
+					"timeframe": {
+						"type": "string",
+						"description": "Timeframe for the strategy."
+					},
+					"reason": {
+						"type": "string",
+						"description": "Reasoning behind the strategy."
+					},
+					"metrics": {
+						"type": "array",
+						"items": {
+							"type": "string",
+							"description": "Metrics used in the strategy."
+						}
+					}
+				},
+				"required": ["type", "header", "entry", "tp_sl", "timeframe", "reason", "metrics"],
+				"additionalProperties": false
+			},
+			"liquidity_card": {
+				"type": "object",
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": ["liquidity"]
+					},
+					"header": {
+						"type": "string",
+						"description": "The header of the liquidity card."
+					},
+					"liquidity": {
+						"type": "string",
+						"description": "Liquidity details for the card."
+					},
+					"netVolume": {
+						"type": "string",
+						"description": "Net volume of liquidity."
+					},
+					"buyerSellerRatio": {
+						"type": "string",
+						"description": "Ratio of buyers to sellers."
+					},
+					"interpretation": {
+						"type": "string",
+						"description": "Interpretation of the liquidity data."
+					},
+					"metrics": {
+						"type": "array",
+						"items": {
+							"type": "string",
+							"description": "Metrics used in the liquidity analysis."
+						}
+					}
+				},
+				"required": [
+					"type",
+					"header",
+					"liquidity",
+					"netVolume",
+					"buyerSellerRatio",
+					"interpretation",
+					"metrics"
+				],
+				"additionalProperties": false
+			},
+			"holder_card": {
+				"type": "object",
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": ["holders"]
+					},
+					"header": {
+						"type": "string",
+						"description": "The header of the holders card."
+					},
+					"holders": {
+						"type": "number",
+						"description": "Number of holders."
+					},
+					"proTraders": {
+						"type": "number",
+						"description": "Number of pro traders."
+					},
+					"top10Percentage": {
+						"type": "string",
+						"description": "Percentage of top 10 holders."
+					},
+					"interpretation": {
+						"type": "string",
+						"description": "Interpretation of the holders data."
+					},
+					"metrics": {
+						"type": "array",
+						"items": {
+							"type": "string",
+							"description": "Metrics used in the holder analysis."
+						}
+					}
+				},
+				"required": [
+					"type",
+					"header",
+					"holders",
+					"proTraders",
+					"top10Percentage",
+					"interpretation",
+					"metrics"
+				],
+				"additionalProperties": false
+			},
+			"manipulation_card": {
+				"type": "object",
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": ["manipulation"]
+					},
+					"header": {
+						"type": "string",
+						"description": "The header of the manipulation card."
+					},
+					"insiderHoldings": {
+						"type": "string",
+						"description": "Percentage of insider holdings."
+					},
+					"developerHolding": {
+						"type": "string",
+						"description": "Percentage of developer holdings."
+					},
+					"sniperHolding": {
+						"type": "string",
+						"description": "Percentage of sniper holdings."
+					},
+					"lpBurned": {
+						"type": "string",
+						"description": "Percentage of LP burned."
+					},
+					"bundlers": {
+						"type": "string",
+						"description": "Percentage of bundlers."
+					},
+					"interpretation": {
+						"type": "string",
+						"description": "Interpretation of the manipulation metrics."
+					}
+				},
+				"required": [
+					"type",
+					"header",
+					"insiderHoldings",
+					"developerHolding",
+					"sniperHolding",
+					"lpBurned",
+					"bundlers",
+					"interpretation"
+				],
+				"additionalProperties": false
+			},
+			"final_call_card": {
+				"type": "object",
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": ["final_call"]
+					},
+					"header": {
+						"type": "string",
+						"description": "The header of the final call card."
+					},
+					"basedOn": {
+						"type": "array",
+						"items": {
+							"type": "string",
+							"description": "Factors considered for the final call."
+						}
+					},
+					"text": {
+						"type": "string",
+						"description": "Final call advice text."
+					},
+					"metrics": {
+						"type": "array",
+						"items": {
+							"type": "string",
+							"description": "Metrics relevant to the final call."
+						}
+					}
+				},
+				"required": ["type", "header", "basedOn", "text", "metrics"],
+				"additionalProperties": false
+			}
+		}
+	},
+	"strict": true
+}

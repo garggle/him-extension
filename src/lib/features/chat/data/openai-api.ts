@@ -167,7 +167,8 @@ export async function sendChatRequest(
 			},
 			body: JSON.stringify({
 				model: 'gpt-4.1',
-				messages: messages
+				messages: messages,
+				response_format: { type: 'json_object' }
 			})
 		});
 

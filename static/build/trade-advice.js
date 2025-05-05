@@ -86,7 +86,8 @@ async function sendChatRequest(message, history = []) {
       },
       body: JSON.stringify({
         model: "gpt-4.1",
-        messages
+        messages,
+        response_format: { type: "json_object" }
       })
     });
     if (!response.ok) {
@@ -125,7 +126,7 @@ function getReadableFactorName(factorKey) {
 function formatEnhancedAnalysisPrompt(enhancedResult, snapshot) {
   const { modelResult, manipulationWarnings, manipulationScore } = enhancedResult;
   const { decision, score, normalizedFactors, factorContributions } = modelResult;
-  let prompt = `Analyze this token trading opportunity:
+  let context = `Trading Opportunity Analysis Context:
 
 MODEL RECOMMENDATION: ${decision} (Score: ${score.toFixed(2)})
 
@@ -136,29 +137,34 @@ KEY INDICATORS:`;
     const isPositiveOnly = key === "liquidityScore";
     const isNegativeBetter = key === "whaleRisk";
     const status = getIndicatorStatus(isNegativeBetter ? -value : value, isPositiveOnly);
-    prompt += `
+    context += `
 - ${getReadableFactorName(key)}: ${value.toFixed(2)} (${status}, Impact: ${(contribution * 100).toFixed(1)}%)`;
   });
   if (manipulationWarnings.length > 0 || manipulationScore > 0) {
-    prompt += `
+    context += `
 
 MANIPULATION ANALYSIS:
 - Risk Score: ${manipulationScore.toFixed(2)} (${getManipulationLevel(manipulationScore)})`;
     if (manipulationWarnings.length > 0) {
-      prompt += `
+      context += `
 - Warnings: ${manipulationWarnings.join("; ")}`;
     }
+  } else {
+    context += `
+
+MANIPULATION ANALYSIS: Risk Score: ${manipulationScore.toFixed(2)} (Low)`;
   }
   if (snapshot) {
-    prompt += `
+    context += `
 
 TOKEN METRICS:
 - Market Cap: ${snapshot.overall.mcap}
-- Price: ${snapshot.overall.price} (1st number which is not 0 after decimal point means the number of 0 after decimal point)
+- Price: ${snapshot.overall.price}
 - Liquidity: ${snapshot.overall.liquidity}
-- Volume: ${snapshot.timestamped.volume}
-- Net Volume: ${snapshot.timestamped.netVolume} in last ${snapshot.timestamped.timeframe}
-- Buyers/Sellers: ${snapshot.timestamped.buyers}/${snapshot.timestamped.sellers} in last ${snapshot.timestamped.timeframe}
+- Total Supply: ${snapshot.overall.totalSupply}
+- Volume (${snapshot.timestamped.timeframe}): ${snapshot.timestamped.volume}
+- Net Volume (${snapshot.timestamped.timeframe}): ${snapshot.timestamped.netVolume}
+- Buyers/Sellers (${snapshot.timestamped.timeframe}): ${snapshot.timestamped.buyers}/${snapshot.timestamped.sellers}
 - Top 10 Holders %: ${snapshot.tokenInfo.top10Holders}
 - Insider Holdings %: ${snapshot.tokenInfo.insiderHoldings}
 - Developer Holdings %: ${snapshot.tokenInfo.developerHolding}
@@ -169,9 +175,24 @@ TOKEN METRICS:
 - Pro Traders: ${snapshot.tokenInfo.proTraders}
 - Dexscreener Paid: ${snapshot.tokenInfo.dexPaid}`;
   }
-  prompt += `
+  const instructions = `
+INSTRUCTIONS:
+Based *only* on the provided Trading Opportunity Analysis Context, generate a JSON object containing practical advice for trading this SOLANA memecoin.
+The JSON object MUST strictly follow this structure:
+{
+  "actionStrategy": { "header": string, "body": { "entry": string, "tp_sl": string, "timeframe": string, "reason": string }, "metrics": string[] },
+  "liquidityPump": { "header": string, "body": { "liquidity": string, "net_volume": string, "buyer_seller_ratio": string, "interpretation": string }, "metrics": string[] },
+  "holderStructure": { "header": string, "body": { "holders": string, "pro_traders": string, "top_10_pct": string, "interpretation": string }, "metrics": string[] },
+  "manipulationRisk": { "header": string, "body": { "insider_pct": string, "dev_pct": string, "snipers_pct": string, "lp_burned_pct": string, "bundlers_pct": string, "interpretation": string }, "metrics": string[] },
+  "finalCall": { "header": string, "body": { "based_on": string[], "text": string }, "metrics": string[] }
+}
 
-Based on these indicators, metrics, and manipulation analysis, what should I do on this SOLANA memecoin? Give me very practical memecoin trading advice in a natural, conversational tone. Give numbers and percentages to aim for PnL, Stop Loss, Take Profit. Consider risk levels, timing, and potential strategies. First give what I should do, then explain why. But be concise. Produce 5 sentences or less. No newlines. Make the first message start with "Action:"`;
+- Headers should follow the examples: "\u2705 Strategy: ...", "\u2728 Liquidity Health: ...", "\u{1F465} Holder Risk: ...", "\u{1F433} Manipulation Risk: ...", "\u26A0\uFE0F Final Call: ..."
+- Populate the body fields using the provided context. Be concise and specific (e.g., give percentages for TP/SL). Assume a standard memecoin goal of >60% profit if buying.
+- The 'metrics' arrays should list the key data points from the context that informed each card's analysis.
+- Respond ONLY with the JSON object. Do not include any other text, greetings, or explanations before or after the JSON. Ensure the JSON is valid.
+`;
+  const prompt = context + instructions;
   return prompt;
 }
 function getIndicatorStatus(value, isPositiveOnly = false) {
@@ -207,10 +228,12 @@ function getManipulationLevel(score) {
 async function getEnhancedTradeAdvice(enhancedResult, snapshot) {
   try {
     const prompt = formatEnhancedAnalysisPrompt(enhancedResult, snapshot);
-    return await sendChatRequest(prompt, []);
+    const jsonResponseString = await sendChatRequest(prompt, []);
+    const adviceCards = JSON.parse(jsonResponseString);
+    return adviceCards;
   } catch (error) {
-    console.error("Error getting enhanced trade advice:", error);
-    throw error;
+    console.error("Error getting or parsing enhanced trade advice:", error);
+    throw new Error("Failed to get or parse trade advice from AI.");
   }
 }
 export {
