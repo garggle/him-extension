@@ -16,6 +16,9 @@ let lastUrl = window.location.href;
 // Track button presence to avoid duplicate injections
 let buttonInjected = false;
 
+// Persistent checker interval
+let persistentCheckerInterval = null;
+
 // Main initialization function
 function initialize() {
 	// Check if we're on a meme token page
@@ -37,6 +40,39 @@ function initialize() {
 		// Reset button state when not on a meme page
 		buttonInjected = false;
 	}
+
+	// Setup persistent checker if not already running
+	setupPersistentChecker();
+}
+
+/**
+ * Sets up a persistent checker that continuously monitors for meme pages
+ * This ensures we catch navigation events even if other methods fail
+ */
+function setupPersistentChecker() {
+	// Clear any existing persistent checker
+	if (persistentCheckerInterval) {
+		clearInterval(persistentCheckerInterval);
+	}
+
+	// Set up a new persistent checker that runs every 2 seconds
+	persistentCheckerInterval = setInterval(() => {
+		// Check if URL indicates we're on a meme page
+		const onMemePage = window.location.href.match(/^https?:\/\/(www\.)?axiom\.trade\/meme\/.+/i);
+
+		// If we're on a meme page but the state doesn't reflect that, reinitialize
+		if (onMemePage && (!isOnMemePage || !document.getElementById('him-analyzer-button'))) {
+			console.log('Axiom Analyzer: Persistent checker detected meme page, reinitializing');
+			isOnMemePage = true;
+			buttonInjected = false;
+			setTimeout(injectAnalyzerButton, 500);
+		} else if (!onMemePage && isOnMemePage) {
+			// Update our state if we've navigated away from a meme page
+			console.log('Axiom Analyzer: Persistent checker detected navigation away from meme page');
+			isOnMemePage = false;
+			buttonInjected = false;
+		}
+	}, 2000); // Check every 2 seconds
 }
 
 /**
@@ -45,7 +81,7 @@ function initialize() {
  */
 function setupInjectionSafetyNet() {
 	let attemptCount = 0;
-	const maxAttempts = 5;
+	const maxAttempts = 10; // Increased from 5 to 10 attempts
 
 	// Clear any existing safety net interval
 	if (window.axiomInjectionInterval) {
@@ -55,10 +91,15 @@ function setupInjectionSafetyNet() {
 	// Setup new interval
 	window.axiomInjectionInterval = setInterval(() => {
 		// Only try if we're on a meme page and button isn't present
-		if (isOnMemePage && !document.getElementById('him-analyzer-button')) {
+		if (
+			window.location.href.match(/^https?:\/\/(www\.)?axiom\.trade\/meme\/.+/i) &&
+			!document.getElementById('him-analyzer-button')
+		) {
 			console.log(
 				`Axiom Analyzer: Safety net injection attempt ${attemptCount + 1}/${maxAttempts}`
 			);
+			// Reset the buttonInjected flag before trying again
+			buttonInjected = false;
 			injectAnalyzerButton();
 			attemptCount++;
 
@@ -74,7 +115,7 @@ function setupInjectionSafetyNet() {
 			window.axiomInjectionInterval = null;
 			console.log('Axiom Analyzer: Safety net no longer needed');
 		}
-	}, 3000); // Try every 3 seconds
+	}, 2000); // Try every 2 seconds (faster than before)
 }
 
 // Setup URL change detection (for SPA navigation)
@@ -244,18 +285,32 @@ window.addEventListener('load', () => {
 	initialize();
 	setupNavigationMonitoring();
 	setupNetworkMonitoring();
+	setupPersistentChecker(); // Ensure persistent checker is set up
 });
 
 // Run initialization immediately in case the page is already loaded
 initialize();
 setupNavigationMonitoring();
 setupNetworkMonitoring();
+setupPersistentChecker(); // Ensure persistent checker is set up
 
 /**
  * Injects the analysis button into the page
  */
 function injectAnalyzerButton() {
 	try {
+		// Verify we're still on a meme page (URL could have changed)
+		const onMemePage = window.location.href.match(/^https?:\/\/(www\.)?axiom\.trade\/meme\/.+/i);
+		if (!onMemePage) {
+			console.log('Axiom Analyzer: Not on a meme page anymore, skipping injection.');
+			isOnMemePage = false;
+			buttonInjected = false;
+			return;
+		}
+
+		// Update our state
+		isOnMemePage = true;
+
 		// Check if button already exists to avoid duplicates
 		if (document.getElementById('him-analyzer-button')) {
 			console.log('Axiom Analyzer: Button already exists. Skipping injection.');

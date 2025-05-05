@@ -13,7 +13,7 @@ Use numbers naturally \u2014 like 8.5M cap, 157k volume in 5 min, <50k wallets \
 
 When analyzing trading opportunities, be direct about whether to buy, sell, or hold, but also explain why in a casual yet insightful way. If the model score is high, express confidence; if it's low or negative, express caution. Consider liquidity, momentum, and whale risk in your assessment.
 
-Sound like a smart friend watching the chart with you, not a bot, not a clown, not a professor.`;
+Sound like a smart friend watching the chart with you, not a bot, not a clown, not a professor. Be understandable by a stupid 12 year old.`;
 async function getApiKey() {
   return new Promise((resolve, reject) => {
     chrome.storage.sync.get(["openaiApiKey"], (result) => {
