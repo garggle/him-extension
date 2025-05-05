@@ -10,7 +10,6 @@
 		getTradeAdvice,
 		type TradingAdviceCards
 	} from '$lib/features/chat/data/trading-analyzer.js';
-	import InputArea from '$lib/features/chat/InputArea.svelte';
 	import { splitIntoMessages } from '$lib/shared/utils/message-splitter.js';
 	import { onMount } from 'svelte';
 
@@ -437,7 +436,7 @@
 					</button>
 				</div>
 			{/if}
-			<InputArea bind:value={currentInput} onsend={handleSend} disabled={isLoading || isTyping} />
+			<!-- <InputArea bind:value={currentInput} onsend={handleSend} disabled={isLoading || isTyping} /> -->
 		</div>
 	{/if}
 </div>

@@ -3,6 +3,8 @@
  * Handles direct API calls to OpenAI without requiring a server
  */
 
+import { DEFAULT_OPENAI_API_KEY } from '../../../shared/constants/api-keys.js';
+
 // Constants
 const SYSTEM_PROMPT = `Use words that are understandable by a 12 year old. Wait for the user to give you signals or ask you questions. No caps. Be as concise as possible. The user is a Solana memecoin trader on Photon.
 
@@ -43,47 +45,47 @@ export async function storeApiKey(apiKey: string): Promise<void> {
 
 /**
  * Retrieves the OpenAI API key from Chrome storage
+ * Falls back to the default API key if not found
  */
 export async function getApiKey(): Promise<string> {
 	return new Promise((resolve, reject) => {
 		chrome.storage.sync.get(['openaiApiKey'], (result) => {
 			try {
-				if (!result.openaiApiKey) {
-					reject(new Error('API key not found. Please configure your OpenAI API key first.'));
-					return;
-				}
-
+				// First try to get user's configured key
 				if (
-					typeof result.openaiApiKey !== 'string' ||
-					!result.openaiApiKey.trim().startsWith('sk-')
+					result.openaiApiKey &&
+					typeof result.openaiApiKey === 'string' &&
+					result.openaiApiKey.trim().startsWith('sk-')
 				) {
-					reject(
-						new Error('Invalid API key format. Please reconfigure with a valid OpenAI API key.')
-					);
+					resolve(result.openaiApiKey);
 					return;
 				}
 
-				resolve(result.openaiApiKey);
+				// Fall back to default key
+				resolve(DEFAULT_OPENAI_API_KEY);
 			} catch (error) {
 				console.error('Error retrieving API key:', error);
-				reject(new Error('Failed to retrieve API key. Please try reconfiguring your API key.'));
+				// Fall back to default key on error
+				resolve(DEFAULT_OPENAI_API_KEY);
 			}
 		});
 	});
 }
 
 /**
- * Checks if an API key exists in storage
+ * Checks if an API key exists in storage or default is available
  */
 export async function hasApiKey(): Promise<boolean> {
 	return new Promise((resolve) => {
 		chrome.storage.sync.get(['openaiApiKey'], (result) => {
-			// Check both existence and basic validity
-			const isValid =
+			// Check both existence and basic validity of user key
+			const isUserKeyValid =
 				!!result.openaiApiKey &&
 				typeof result.openaiApiKey === 'string' &&
 				result.openaiApiKey.trim().startsWith('sk-');
-			resolve(isValid);
+
+			// If user has a valid key or we have a default key, return true
+			resolve(isUserKeyValid || DEFAULT_OPENAI_API_KEY.startsWith('sk-'));
 		});
 	});
 }
