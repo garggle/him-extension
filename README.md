@@ -1,4 +1,4 @@
-# Him AI Trading Buddy Extension
+# him Extension
 
 A Chrome Extension featuring an AI chatbot interface called "Him" for providing market insights directly within your browser's side panel. Now featuring gpt-4.1 integration for intelligent responses.
 
