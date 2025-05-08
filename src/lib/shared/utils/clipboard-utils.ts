@@ -47,7 +47,7 @@ export async function readFromClipboard(): Promise<string | null> {
 				const text = await navigator.clipboard.readText();
 				return text || null;
 			} catch (clipError) {
-				console.log('Standard clipboard API failed, trying alternative method...');
+				// console.log('Standard clipboard API failed, trying alternative method...');
 				// If this fails due to permissions, fall back to the DOM-based approach
 			}
 		}
@@ -155,10 +155,10 @@ export async function writeToClipboard(text: string): Promise<boolean> {
 export function extractTokenAddressFromClipboard(clipboardText: string): string | null {
 	if (!clipboardText) return null;
 
-	console.log(
-		'Extracting address from clipboard text:',
-		clipboardText.substring(0, 50) + (clipboardText.length > 50 ? '...' : '')
-	);
+	// console.log(
+	// 	'Extracting address from clipboard text:',
+	// 	clipboardText.substring(0, 50) + (clipboardText.length > 50 ? '...' : '')
+	// );
 
 	// Remove any whitespace, newlines, or common URL components
 	const cleanedText = clipboardText.replace(/\s+/g, '');
@@ -169,10 +169,10 @@ export function extractTokenAddressFromClipboard(clipboardText: string): string 
 	const matches = cleanedText.match(solanaAddressRegex);
 
 	if (matches && matches.length > 0) {
-		console.log('Found address match:', matches[0]);
+		// console.log('Found address match:', matches[0]);
 		return matches[0];
 	}
 
-	console.log('No valid address found in clipboard');
+	// console.log('No valid address found in clipboard');
 	return null;
 }

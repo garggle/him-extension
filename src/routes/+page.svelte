@@ -183,7 +183,7 @@
 	function listenForTradeAdviceRequests() {
 		chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
 			if (message.type === 'PROCESS_TRADE_ADVICE') {
-				console.log('Extension page received request to process trade advice');
+				// console.log('Extension page received request to process trade advice');
 
 				// Let background script know we're here and processing
 				sendResponse({ received: true });
@@ -200,7 +200,7 @@
 
 						if (isRecent && analysisResult) {
 							// Use the OpenAI API to get trade advice
-							console.log('Processing trade advice request', analysisResult);
+							// console.log('Processing trade advice request', analysisResult);
 
 							// Get API key and check if configured
 							if (!(await hasApiKey())) {
@@ -212,7 +212,7 @@
 
 							// Get the trade advice
 							const advice = await getTradeAdvice(analysisResult, snapshot);
-							console.log('Trade advice generated:', advice);
+							// console.log('Trade advice generated:', advice);
 
 							// Send the advice back to the background script
 							chrome.runtime.sendMessage({

@@ -25,7 +25,7 @@ function initialize() {
 	isOnMemePage = window.location.href.match(/^https?:\/\/(www\.)?axiom\.trade\/meme\/.+/i);
 
 	if (isOnMemePage) {
-		console.log('Axiom Analyzer: Detected meme token page');
+		// console.log('Axiom Analyzer: Detected meme token page');
 		// Only inject if not already present
 		if (!document.getElementById('him-analyzer-button')) {
 			buttonInjected = false;
@@ -62,13 +62,13 @@ function setupPersistentChecker() {
 
 		// If we're on a meme page but the state doesn't reflect that, reinitialize
 		if (onMemePage && (!isOnMemePage || !document.getElementById('him-analyzer-button'))) {
-			console.log('Axiom Analyzer: Persistent checker detected meme page, reinitializing');
+			// console.log('Axiom Analyzer: Persistent checker detected meme page, reinitializing');
 			isOnMemePage = true;
 			buttonInjected = false;
 			setTimeout(injectAnalyzerButton, 500);
 		} else if (!onMemePage && isOnMemePage) {
 			// Update our state if we've navigated away from a meme page
-			console.log('Axiom Analyzer: Persistent checker detected navigation away from meme page');
+			// console.log('Axiom Analyzer: Persistent checker detected navigation away from meme page');
 			isOnMemePage = false;
 			buttonInjected = false;
 		}
@@ -95,9 +95,9 @@ function setupInjectionSafetyNet() {
 			window.location.href.match(/^https?:\/\/(www\.)?axiom\.trade\/meme\/.+/i) &&
 			!document.getElementById('him-analyzer-button')
 		) {
-			console.log(
-				`Axiom Analyzer: Safety net injection attempt ${attemptCount + 1}/${maxAttempts}`
-			);
+			// console.log(
+			// 	`Axiom Analyzer: Safety net injection attempt ${attemptCount + 1}/${maxAttempts}`
+			// );
 			// Reset the buttonInjected flag before trying again
 			buttonInjected = false;
 			injectAnalyzerButton();
@@ -107,13 +107,13 @@ function setupInjectionSafetyNet() {
 			if (attemptCount >= maxAttempts) {
 				clearInterval(window.axiomInjectionInterval);
 				window.axiomInjectionInterval = null;
-				console.log('Axiom Analyzer: Maximum safety net attempts reached');
+				// console.log('Axiom Analyzer: Maximum safety net attempts reached');
 			}
 		} else {
 			// If button exists or we're not on a meme page, clear the interval
 			clearInterval(window.axiomInjectionInterval);
 			window.axiomInjectionInterval = null;
-			console.log('Axiom Analyzer: Safety net no longer needed');
+			// console.log('Axiom Analyzer: Safety net no longer needed');
 		}
 	}, 2000); // Try every 2 seconds (faster than before)
 }
@@ -172,12 +172,12 @@ function setupNavigationMonitoring() {
 
 		// If we found a content container, observe it
 		if (contentContainer) {
-			console.log('Axiom Analyzer: Setting up content observer on', contentContainer);
+			// console.log('Axiom Analyzer: Setting up content observer on', contentContainer);
 			const contentObserver = new MutationObserver(
 				throttle(() => {
 					// Check if we're on a meme page but button is missing
 					if (isOnMemePage && !document.getElementById('him-analyzer-button') && !buttonInjected) {
-						console.log('Axiom Analyzer: Content changed, attempting button injection');
+						// console.log('Axiom Analyzer: Content changed, attempting button injection');
 						setTimeout(injectAnalyzerButton, 500);
 					}
 
@@ -243,7 +243,7 @@ function throttle(func, limit) {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 	if (message.type === 'TRADE_ADVICE_RESULT' && message.advice) {
 		// We received the trade advice from the extension page
-		console.log('Received trade advice result:', message.advice);
+		// console.log('Received trade advice result:', message.advice);
 
 		// Get the button element
 		const button = document.getElementById('him-analyzer-button');
@@ -302,7 +302,7 @@ function injectAnalyzerButton() {
 		// Verify we're still on a meme page (URL could have changed)
 		const onMemePage = window.location.href.match(/^https?:\/\/(www\.)?axiom\.trade\/meme\/.+/i);
 		if (!onMemePage) {
-			console.log('Axiom Analyzer: Not on a meme page anymore, skipping injection.');
+			// console.log('Axiom Analyzer: Not on a meme page anymore, skipping injection.');
 			isOnMemePage = false;
 			buttonInjected = false;
 			return;
@@ -313,7 +313,7 @@ function injectAnalyzerButton() {
 
 		// Check if button already exists to avoid duplicates
 		if (document.getElementById('him-analyzer-button')) {
-			console.log('Axiom Analyzer: Button already exists. Skipping injection.');
+			// console.log('Axiom Analyzer: Button already exists. Skipping injection.');
 			return;
 		}
 
@@ -334,7 +334,7 @@ function injectAnalyzerButton() {
 
 		// Method 2: Look for specific dashboard elements if XPath fails
 		if (!targetElement) {
-			console.log('Axiom Analyzer: Primary XPath failed, trying alternative selectors...');
+			// console.log('Axiom Analyzer: Primary XPath failed, trying alternative selectors...');
 
 			// Try common selectors that might contain trading actions
 			const selectors = [
@@ -353,7 +353,7 @@ function injectAnalyzerButton() {
 					// Get the last button's parent as our target
 					targetElement = elements[elements.length - 1].parentElement;
 					if (targetElement) {
-						console.log(`Axiom Analyzer: Found target using selector: ${selector}`);
+						// console.log(`Axiom Analyzer: Found target using selector: ${selector}`);
 						break;
 					}
 				}
@@ -372,7 +372,7 @@ function injectAnalyzerButton() {
 					// Found a container with trading-related text
 					targetElement = element.closest('div:not(body)');
 					if (targetElement) {
-						console.log('Axiom Analyzer: Found target using keyword search');
+						// console.log('Axiom Analyzer: Found target using keyword search');
 						break;
 					}
 				}
@@ -444,7 +444,7 @@ function injectAnalyzerButton() {
 		if (flexContainer && flexContainer.parentNode) {
 			flexContainer.parentNode.insertBefore(buttonWrapper, flexContainer.nextSibling);
 			inserted = true;
-			console.log('Axiom Analyzer: Button inserted after flex container');
+			// console.log('Axiom Analyzer: Button inserted after flex container');
 		}
 
 		// Method 2: Try to insert after the target's parent
@@ -453,7 +453,7 @@ function injectAnalyzerButton() {
 			if (parentContainer && parentContainer.parentNode) {
 				parentContainer.parentNode.insertBefore(buttonWrapper, parentContainer.nextSibling);
 				inserted = true;
-				console.log('Axiom Analyzer: Button inserted after parent container');
+				// console.log('Axiom Analyzer: Button inserted after parent container');
 			}
 		}
 
@@ -461,10 +461,10 @@ function injectAnalyzerButton() {
 		if (!inserted) {
 			targetElement.appendChild(buttonWrapper);
 			inserted = true;
-			console.log('Axiom Analyzer: Button appended to target element');
+			// console.log('Axiom Analyzer: Button appended to target element');
 		}
 
-		console.log('Axiom Analyzer: Button successfully injected');
+		// console.log('Axiom Analyzer: Button successfully injected');
 	} catch (error) {
 		// Reset flag since injection failed
 		buttonInjected = false;
@@ -485,7 +485,7 @@ async function handleAnalyzerClick() {
 	button.disabled = true;
 
 	try {
-		console.log('Axiom Analyzer: Starting analysis');
+		// console.log('Axiom Analyzer: Starting analysis');
 
 		// 1. Get Axiom data from the page
 		const axiomData = await getAxiomData();
@@ -493,7 +493,7 @@ async function handleAnalyzerClick() {
 			throw new Error('Failed to get token data');
 		}
 
-		console.log('Axiom Analyzer: Token data retrieved:', axiomData);
+		// console.log('Axiom Analyzer: Token data retrieved:', axiomData);
 
 		// 2. Try to get GeckoTerminal data if possible
 		const poolAddress = getPoolAddressFromUrl();
@@ -502,7 +502,7 @@ async function handleAnalyzerClick() {
 		if (poolAddress) {
 			try {
 				geckoData = await getGeckoData(poolAddress);
-				console.log('Axiom Analyzer: GeckoTerminal data retrieved:', geckoData);
+				// console.log('Axiom Analyzer: GeckoTerminal data retrieved:', geckoData);
 			} catch (error) {
 				console.warn('Axiom Analyzer: Failed to get GeckoTerminal data:', error);
 				// Continue without Gecko data
@@ -559,7 +559,7 @@ async function handleAnalyzerClick() {
 		};
 
 		// 5. Send analysis data to OpenAI through background script
-		console.log('Sending analysis to OpenAI for trading advice...');
+		// console.log('Sending analysis to OpenAI for trading advice...');
 
 		// Update button to indicate waiting for OpenAI
 		button.textContent = 'Getting advice...';
@@ -574,10 +574,10 @@ async function handleAnalyzerClick() {
 
 			if (response && response.success) {
 				if (response.status === 'pending') {
-					console.log('Trade advice request is pending processing by extension page');
+					// console.log('Trade advice request is pending processing by extension page');
 					// The advice will come through the message listener
 				} else if (response.advice) {
-					console.log('Received trading advice:', response.advice);
+					// console.log('Received trading advice:', response.advice);
 
 					// Show a temporary success message on the button
 					button.textContent = 'Advice received!';
@@ -600,11 +600,11 @@ async function handleAnalyzerClick() {
 				throw new Error(response?.error || 'Failed to get trading advice');
 			}
 		} catch (error) {
-			console.error('Failed to get OpenAI trading advice:', error);
+			// console.error('Failed to get OpenAI trading advice:', error);
 			throw new Error('Failed to get AI trading advice');
 		}
 	} catch (error) {
-		console.error('Axiom Analyzer: Analysis failed:', error);
+		// console.error('Axiom Analyzer: Analysis failed:', error);
 		button.textContent = 'Analysis Failed';
 
 		// Reset the button text after 2 seconds
@@ -659,7 +659,7 @@ function getTokenNameFromPage() {
 
 		return 'Unknown Token';
 	} catch (error) {
-		console.error('Failed to get token name:', error);
+		// console.error('Failed to get token name:', error);
 		return 'Unknown Token';
 	}
 }
@@ -876,7 +876,7 @@ async function analyzeData(axiomData, geckoData) {
 		};
 
 		// Log the normalized factors for debugging
-		console.log('Normalized factors:', factors);
+		// console.log('Normalized factors:', factors);
 
 		// Parse relevant metrics from snapshot
 		const liquidity = parseMoneyString(snapshot.overall.liquidity);
@@ -972,13 +972,13 @@ function setupNetworkMonitoring() {
 
 					// If we found relevant API calls, check if we need to reinitialize
 					if (navigationApis.length > 0) {
-						console.log('Axiom Analyzer: Detected relevant API calls, checking initialization');
+						// console.log('Axiom Analyzer: Detected relevant API calls, checking initialization');
 						if (window.location.href.match(/^https?:\/\/(www\.)?axiom\.trade\/meme\/.+/i)) {
 							// We're on a meme page - check if the button needs to be injected
 							if (!document.getElementById('him-analyzer-button') && !buttonInjected) {
-								console.log(
-									'Axiom Analyzer: API activity detected on meme page, attempting button injection'
-								);
+								// console.log(
+								// 	'Axiom Analyzer: API activity detected on meme page, attempting button injection'
+								// );
 								setTimeout(injectAnalyzerButton, 1000);
 							}
 						}
@@ -988,7 +988,7 @@ function setupNetworkMonitoring() {
 
 			// Start observing network requests
 			observer.observe({ entryTypes: ['resource'] });
-			console.log('Axiom Analyzer: Network request monitoring initialized');
+			// console.log('Axiom Analyzer: Network request monitoring initialized');
 		} catch (error) {
 			console.warn('Axiom Analyzer: Error setting up network monitoring:', error);
 		}

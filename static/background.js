@@ -25,7 +25,7 @@ chrome.action.onClicked.addListener((tab) => {
 
 // Handle messages from content scripts
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-	console.log('Background script received message:', message);
+	// console.log('Background script received message:', message);
 
 	if (message.type === 'GET_AXIOM_DATA') {
 		// Execute a script in the sender's tab to scrape Axiom data
@@ -83,11 +83,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 					})
 					.then(() => {
 						// If extension page is open and processed the request, it will respond
-						console.log('Trade advice request processed by extension page');
+						// console.log('Trade advice request processed by extension page');
 					})
 					.catch((error) => {
 						// If no listener is active (extension not open), open the extension
-						console.log('No active listeners, opening extension page to process request');
+						// console.log('No active listeners, opening extension page to process request');
 						if (sender.tab && sender.tab.windowId) {
 							// Open the side panel to process the request
 							chrome.sidePanel.open({ windowId: sender.tab.windowId });
@@ -134,7 +134,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 				}
 			},
 			() => {
-				console.log('Trade advice stored in session storage');
+				// console.log('Trade advice stored in session storage');
 
 				// Try to notify the panel if it's already open
 				try {
@@ -153,7 +153,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 							}
 						});
 				} catch (error) {
-					console.log('Panel not open yet, opening side panel');
+					// console.log('Panel not open yet, opening side panel');
 					// Open the side panel if it's not already open
 					if (sender.tab && sender.tab.windowId) {
 						chrome.sidePanel.open({ windowId: sender.tab.windowId });
@@ -171,8 +171,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 // Function to scrape Axiom data from the page - executed in content context
 function scrapeAxiomData() {
-	// XPath config for data extraction
-	const XPATH_CONFIG = {
+	// XPath config for data extraction - default configuration
+	const DEFAULT_XPATH_CONFIG = {
 		top10Holders:
 			'/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[3]/div[2]/div[1]/div[1]/div[1]/span',
 		developerHolding:
@@ -214,6 +214,54 @@ function scrapeAxiomData() {
 		holding:
 			'/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[2]/div[2]/div/div[1]/div[5]/div/div[3]/div/span',
 		pnl: '/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[2]/div[2]/div/div[1]/div[5]/div/div[7]/div/span',
+		balance: '/html/body/div[1]/div[1]/div/div[3]/div[2]/div[2]/div/div/button/div[1]/span'
+	};
+
+	// XPath config for data extraction when uxento banner is present
+	const UXENTO_XPATH_CONFIG = {
+		// Add your uxento-specific XPaths here
+		// Example format:
+		top10Holders:
+			'/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[4]/div[2]/div[1]/div[1]/div[1]/span',
+		developerHolding:
+			'/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[4]/div[2]/div[1]/div[2]/div[1]/span',
+		sniperHolding:
+			'/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[4]/div[2]/div[1]/div[3]/div[1]/span',
+		insiderHoldings:
+			'/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[4]/div[2]/div[2]/div[1]/div[1]/span',
+		bundlers:
+			'/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[4]/div[2]/div[2]/div[2]/div[1]/span',
+		lpBurned:
+			'/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[4]/div[2]/div[2]/div[3]/div[1]/span',
+		holders:
+			'/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[4]/div[2]/div[4]/div[1]/div[1]/span',
+		proTraders:
+			'/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[4]/div[2]/div[4]/div[2]/div[1]/span',
+		dexPaid:
+			'/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[4]/div[2]/div[4]/div[3]/div[1]/span',
+		currentTimeScaleVolume:
+			'/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[2]/div[2]/div/div[1]/div[1]/span[2]',
+		currentTimeScaleBuyers:
+			'/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[2]/div[2]/div/div[1]/div[2]/div/span[1]',
+		currentTimeScaleSellers:
+			'/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[2]/div[2]/div/div[1]/div[3]/div/span[1]',
+		timeframe:
+			'/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[2]/div[2]/div/div[1]/div[1]/span[1]/text()[1]',
+		contractAge:
+			'/html/body/div[1]/div[3]/div/div/div/div/div[1]/div[1]/div/div[1]/div[2]/div/div[1]/div[2]/div[2]/span[1]',
+		price:
+			'/html/body/div[1]/div[3]/div/div/div/div/div[1]/div[1]/div/div[1]/div[2]/div/div[3]/div/span',
+		liquidity:
+			'/html/body/div[1]/div[3]/div/div/div/div/div[1]/div[1]/div/div[1]/div[2]/div/div[4]/div/span',
+		mcap: '/html/body/div[1]/div[3]/div/div/div/div/div[1]/div[1]/div/div[1]/div[2]/div/div[4]/div/span',
+		totalSupply:
+			'/html/body/div[1]/div[3]/div/div/div/div/div[1]/div[1]/div/div[1]/div[2]/div/div[5]/div/div/span',
+		bought:
+			'/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[3]/div[2]/div/div[1]/div[6]/div/div[1]/div/span',
+		sold: '/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[3]/div[2]/div/div[1]/div[5]/div/div[3]/div/span',
+		holding:
+			'/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[3]/div[2]/div/div[1]/div[5]/div/div[3]/div/span',
+		pnl: '/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[3]/div[2]/div/div[1]/div[5]/div/div[7]/div/span',
 		balance: '/html/body/div[1]/div[1]/div/div[3]/div[2]/div[2]/div/div/button/div[1]/span'
 	};
 
@@ -277,6 +325,10 @@ function scrapeAxiomData() {
 		}
 	}
 
+	// Determine which XPath config to use based on presence of uxento banner
+	const hasUxentoBanner = document.querySelector('.uxento-dex-banner') !== null;
+	const XPATH_CONFIG = hasUxentoBanner ? UXENTO_XPATH_CONFIG : DEFAULT_XPATH_CONFIG;
+
 	// 1. Scrape all data into a flat structure first
 	const flatData = {};
 	for (const [dataKey, xpath] of Object.entries(XPATH_CONFIG)) {
@@ -329,7 +381,7 @@ async function fetchGeckoTerminalData(poolAddress, network = 'solana') {
 		const ohlcvUrl = `${GECKO_API_BASE_URL}/networks/${network}/pools/${poolAddress}/ohlcv/minute?limit=1000`;
 		const tradesUrl = `${GECKO_API_BASE_URL}/networks/${network}/pools/${poolAddress}/trades`;
 
-		console.log('Fetching GeckoTerminal data:', { ohlcvUrl, tradesUrl });
+		// console.log('Fetching GeckoTerminal data:', { ohlcvUrl, tradesUrl });
 
 		// Fetch both endpoints concurrently
 		const [ohlcvResponse, tradesResponse] = await Promise.all([fetch(ohlcvUrl), fetch(tradesUrl)]);

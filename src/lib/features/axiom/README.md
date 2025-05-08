@@ -33,8 +33,8 @@ import { axiomService } from '$lib/features/axiom';
 const tokenData = axiomService.getTokenData();
 
 if (tokenData) {
-  console.log('Price:', tokenData.price);
-  console.log('Market Cap:', tokenData.mcap);
+  // // console.log('Price:', tokenData.price);
+  // // console.log('Market Cap:', tokenData.mcap);
   // ... use other properties as needed
 }
 ```

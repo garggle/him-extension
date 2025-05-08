@@ -31,9 +31,9 @@ function analyzeMarket(snapshot: Snapshot, candles: Candle[], trades: Trade[]) {
   // Run analysis and get result
   const result = tradingService.analyzeMarketData(snapshot, candles, trades);
   
-  console.log('Trading decision:', result.decision); // 'BUY', 'SELL', or 'HOLD'
-  console.log('Confidence score:', result.score);
-  console.log('Factor breakdown:', result.factors);
+  // // console.log('Trading decision:', result.decision); // 'BUY', 'SELL', or 'HOLD'
+  // // console.log('Confidence score:', result.score);
+  // // console.log('Factor breakdown:', result.factors);
   
   // Later, you can access the results through the reactive store
   const unsubscribe = tradingService.modelResult.subscribe(currentResult => {

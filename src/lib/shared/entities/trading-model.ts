@@ -164,9 +164,9 @@ export function analyzeTradingOpportunity(
 	weights: ModelWeights = DEFAULT_WEIGHTS,
 	thresholds: ModelThresholds = DEFAULT_THRESHOLDS
 ): ModelResult {
-	console.log('Trading Model - Starting analysis with snapshot:', snapshot);
-	console.log('Trading Model - Candles count:', candles.length);
-	console.log('Trading Model - Trades count:', trades.length);
+	// console.log('Trading Model - Starting analysis with snapshot:', snapshot);
+	// console.log('Trading Model - Candles count:', candles.length);
+	// console.log('Trading Model - Trades count:', trades.length);
 
 	// Ensure data is sorted chronologically
 	const sortedCandles = [...candles].sort((a, b) => a.timestamp - b.timestamp);
@@ -187,11 +187,11 @@ export function analyzeTradingOpportunity(
 	const liquidity = parseMoneyString(snapshot.overall.liquidity);
 	const mcap = parseMoneyString(snapshot.overall.mcap);
 
-	console.log('Trading Model - Parsed metrics:', {
-		liquidity,
-		mcap,
-		price: parseMoneyString(snapshot.overall.price)
-	});
+	// console.log('Trading Model - Parsed metrics:', {
+	// 	liquidity,
+	// 	mcap,
+	// 	price: parseMoneyString(snapshot.overall.price)
+	// });
 
 	// Calculate on-chain / fundamental factors
 	if (mcap > 0) {
@@ -203,7 +203,7 @@ export function analyzeTradingOpportunity(
 		parsePercentString(snapshot.tokenInfo.developerHolding) +
 		parsePercentString(snapshot.tokenInfo.insiderHoldings);
 
-	console.log('Trading Model - Calculated factors:', factors);
+	// console.log('Trading Model - Calculated factors:', factors);
 
 	// Calculate weighted composite score
 	const score =
@@ -213,14 +213,14 @@ export function analyzeTradingOpportunity(
 		weights.liquidityScore * factors.liquidityScore -
 		weights.whaleRisk * factors.whaleRisk;
 
-	console.log('Trading Model - Score calculation:', {
-		weightedMomentum: weights.momentum * factors.momentum,
-		weightedVolumeTrend: weights.volumeTrend * factors.volumeTrend,
-		weightedFlowRatio: weights.flowRatio * factors.flowRatio,
-		weightedLiquidityScore: weights.liquidityScore * factors.liquidityScore,
-		weightedWhaleRisk: -weights.whaleRisk * factors.whaleRisk,
-		totalScore: score
-	});
+	// console.log('Trading Model - Score calculation:', {
+	// 	weightedMomentum: weights.momentum * factors.momentum,
+	// 	weightedVolumeTrend: weights.volumeTrend * factors.volumeTrend,
+	// 	weightedFlowRatio: weights.flowRatio * factors.flowRatio,
+	// 	weightedLiquidityScore: weights.liquidityScore * factors.liquidityScore,
+	// 	weightedWhaleRisk: -weights.whaleRisk * factors.whaleRisk,
+	// 	totalScore: score
+	// });
 
 	// Determine decision based on thresholds
 	let decision: Decision = 'HOLD';
@@ -230,11 +230,11 @@ export function analyzeTradingOpportunity(
 		decision = 'SELL';
 	}
 
-	console.log('Trading Model - Final decision:', {
-		decision,
-		score,
-		thresholds
-	});
+	// console.log('Trading Model - Final decision:', {
+	// 	decision,
+	// 	score,
+	// 	thresholds
+	// });
 
 	return {
 		decision,

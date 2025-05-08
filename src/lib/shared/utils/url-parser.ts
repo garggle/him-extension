@@ -10,7 +10,7 @@ export async function getCurrentAxiomPoolAddress(): Promise<string | null> {
 	try {
 		const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
 		if (!tabs || tabs.length === 0) {
-			console.log('No active tab found');
+			// console.log('No active tab found');
 			return null;
 		}
 

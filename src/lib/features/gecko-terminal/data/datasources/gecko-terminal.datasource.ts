@@ -36,7 +36,7 @@ export async function fetchGeckoData(
 		const ohlcvUrl = `${GECKO_API_BASE_URL}/networks/${network}/pools/${poolAddress}/ohlcv/${timeframe}`;
 		const tradesUrl = `${GECKO_API_BASE_URL}/networks/${network}/pools/${poolAddress}/trades`;
 
-		console.log('Fetching GeckoTerminal data:', { ohlcvUrl, tradesUrl });
+		// console.log('Fetching GeckoTerminal data:', { ohlcvUrl, tradesUrl });
 
 		// Fetch both endpoints concurrently
 		const [ohlcvResult, tradesResult] = await Promise.allSettled([

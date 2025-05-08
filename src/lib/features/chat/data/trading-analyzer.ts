@@ -4,8 +4,8 @@
  */
 
 import {
-	type EnhancedAnalysisResult,
-	type NormalizedFactors
+  type EnhancedAnalysisResult,
+  type NormalizedFactors
 } from '$lib/features/trading/index.js';
 import { sendChatRequest } from './openai-api.js';
 
@@ -380,6 +380,6 @@ The JSON object MUST strictly follow this structure:
 
 	// Combine context and instructions into the final prompt
 	const prompt = context + instructions;
-	console.log('Legacy prompt:', prompt);
+	// console.log('Legacy prompt:', prompt);
 	return prompt;
 }

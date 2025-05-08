@@ -33,15 +33,15 @@ async function analyzeAxiomData() {
 		const result = tradingService.analyzeMarketData(snapshotData, candlesData, tradesData);
 
 		// Log the results
-		console.log('===== TRADING MODEL ANALYSIS =====');
-		console.log(`DECISION: ${result.decision}`);
-		console.log(`SCORE: ${result.score.toFixed(4)}`);
-		console.log('\nFACTORS:');
-		console.log(`- Momentum: ${result.factors.momentum.toFixed(4)}`);
-		console.log(`- Volume Trend: ${result.factors.volumeTrend.toFixed(4)}`);
-		console.log(`- Flow Ratio: ${result.factors.flowRatio.toFixed(4)}`);
-		console.log(`- Liquidity Score: ${result.factors.liquidityScore.toFixed(4)}`);
-		console.log(`- Whale Risk: ${result.factors.whaleRisk.toFixed(4)}`);
+		// console.log('===== TRADING MODEL ANALYSIS =====');
+		// console.log(`DECISION: ${result.decision}`);
+		// console.log(`SCORE: ${result.score.toFixed(4)}`);
+		// console.log('\nFACTORS:');
+		// console.log(`- Momentum: ${result.factors.momentum.toFixed(4)}`);
+		// console.log(`- Volume Trend: ${result.factors.volumeTrend.toFixed(4)}`);
+		// console.log(`- Flow Ratio: ${result.factors.flowRatio.toFixed(4)}`);
+		// console.log(`- Liquidity Score: ${result.factors.liquidityScore.toFixed(4)}`);
+		// console.log(`- Whale Risk: ${result.factors.whaleRisk.toFixed(4)}`);
 
 		return result;
 	} catch (error) {
@@ -55,7 +55,7 @@ async function analyzeAxiomData() {
 if (typeof process !== 'undefined' && process.argv.includes('--run-analysis')) {
 	analyzeAxiomData()
 		.then((result) => {
-			console.log('\nAnalysis complete.');
+			// console.log('\nAnalysis complete.');
 		})
 		.catch((error) => {
 			console.error('Analysis failed:', error);

@@ -14,17 +14,17 @@ export function parseMoneyString(moneyString: string): number {
 
 	// Remove currency symbol and commas
 	const cleaned = moneyString.replace(/[$,]/g, '');
-	console.log('parseMoneyString - After cleaning symbols:', cleaned);
+	// console.log('parseMoneyString - After cleaning symbols:', cleaned);
 
 	// Extract the numeric part and the suffix
 	const match = cleaned.match(/^([0-9.]+)([KMBT])?$/i);
-	console.log('parseMoneyString - Regex match:', match);
+	// console.log('parseMoneyString - Regex match:', match);
 
 	if (!match) return 0;
 
 	const [, numericPart, suffix] = match;
 	let value = parseFloat(numericPart);
-	console.log('parseMoneyString - Parsed numeric value:', value);
+	// console.log('parseMoneyString - Parsed numeric value:', value);
 
 	// Apply multiplier based on suffix
 	if (suffix) {
@@ -36,11 +36,11 @@ export function parseMoneyString(moneyString: string): number {
 		};
 
 		value *= multipliers[suffix.toUpperCase()] || 1;
-		console.log('parseMoneyString - After applying multiplier:', {
-			suffix,
-			multiplier: multipliers[suffix.toUpperCase()],
-			finalValue: value
-		});
+		// console.log('parseMoneyString - After applying multiplier:', {
+		// 	suffix,
+		// 	multiplier: multipliers[suffix.toUpperCase()],
+		// 	finalValue: value
+		// });
 	}
 
 	return value;

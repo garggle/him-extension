@@ -4,32 +4,32 @@
  */
 
 import {
-	type Candle,
-	type Decision,
-	type Snapshot,
-	type Trade
+  type Candle,
+  type Decision,
+  type Snapshot,
+  type Trade
 } from '$lib/shared/entities/trading-model.js';
 import { normalizeRSI, normalizeVolatility } from '$lib/shared/utils/normalization.js';
 import { parseMoneyString, parsePercentString } from '$lib/shared/utils/parse-metrics.js';
 import {
-	calculateATR,
-	calculateBollingerBands,
-	calculateEMA,
-	calculateRSI,
-	calculateVWAP
+  calculateATR,
+  calculateBollingerBands,
+  calculateEMA,
+  calculateRSI,
+  calculateVWAP
 } from '$lib/shared/utils/technical-indicators.js';
 import { analyzeTradingFlow } from '../application/flow-analysis.js';
 import {
-	DEFAULT_PERIODS,
-	DEFAULT_THRESHOLDS,
-	DEFAULT_WEIGHTS,
-	type ModelThresholds,
-	type ModelWeights
+  DEFAULT_PERIODS,
+  DEFAULT_THRESHOLDS,
+  DEFAULT_WEIGHTS,
+  type ModelThresholds,
+  type ModelWeights
 } from '../config/model-config.js';
 import {
-	type EnhancedModelResult,
-	type EnhancedTradingFactors,
-	type NormalizedFactors
+  type EnhancedModelResult,
+  type EnhancedTradingFactors,
+  type NormalizedFactors
 } from './trading-types.js';
 
 /**
@@ -42,7 +42,7 @@ export function analyzeEnhancedTradingOpportunity(
 	weights: ModelWeights = DEFAULT_WEIGHTS,
 	thresholds: ModelThresholds = DEFAULT_THRESHOLDS
 ): EnhancedModelResult {
-	console.log('Enhanced Trading Model - Starting analysis');
+	// console.log('Enhanced Trading Model - Starting analysis');
 
 	// Ensure data is sorted chronologically
 	const sortedCandles = [...candles].sort((a, b) => a.timestamp - b.timestamp);
@@ -69,13 +69,13 @@ export function analyzeEnhancedTradingOpportunity(
 	// Apply tanh to keep score bounded in [-1, 1] and dampen extreme values
 	const score = Math.tanh(factorSum);
 
-	console.log('Enhanced Trading Model - Score calculation:', {
-		rawFactors,
-		normalizedFactors,
-		factorContributions,
-		factorSum,
-		finalScore: score
-	});
+	// console.log('Enhanced Trading Model - Score calculation:', {
+	// 	rawFactors,
+	// 	normalizedFactors,
+	// 	factorContributions,
+	// 	factorSum,
+	// 	finalScore: score
+	// });
 
 	// Determine decision based on thresholds
 	let decision: Decision = 'HOLD';
@@ -85,11 +85,11 @@ export function analyzeEnhancedTradingOpportunity(
 		decision = 'SELL';
 	}
 
-	console.log('Enhanced Trading Model - Final decision:', {
-		decision,
-		score,
-		thresholds
-	});
+	// console.log('Enhanced Trading Model - Final decision:', {
+	// 	decision,
+	// 	score,
+	// 	thresholds
+	// });
 
 	return {
 		decision,
@@ -163,11 +163,11 @@ function calculateRawFactors(
 	const mcap = parseMoneyString(snapshot.overall.mcap);
 	const price = parseMoneyString(snapshot.overall.price);
 
-	console.log('Enhanced Trading Model - Parsed metrics:', {
-		liquidity,
-		mcap,
-		price
-	});
+	// console.log('Enhanced Trading Model - Parsed metrics:', {
+	// 	liquidity,
+	// 	mcap,
+	// 	price
+	// });
 
 	// Initialize factors
 	const factors: EnhancedTradingFactors = {

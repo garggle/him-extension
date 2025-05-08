@@ -12,14 +12,14 @@ async function isOnAxiomMemePage(): Promise<boolean> {
 		// Get the active tab's URL using Chrome's extension API
 		const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
 		if (!tabs || tabs.length === 0) {
-			console.log('Debug URL Check: No active tab found');
+			// console.log('Debug URL Check: No active tab found');
 			return false;
 		}
 
 		const currentUrl = tabs[0].url || '';
 		const axiomMemeRegex = /^https?:\/\/(www\.)?axiom\.trade\/meme\/.+/i;
 		const result = axiomMemeRegex.test(currentUrl);
-		console.log('Debug URL Check:', { currentUrl, matches: result });
+		// console.log('Debug URL Check:', { currentUrl, matches: result });
 		return result;
 	} catch (error) {
 		console.error('Error checking URL:', error);
@@ -168,12 +168,12 @@ async function scrapeDataFromActiveTab(): Promise<AxiomTokenData | null> {
 							tempDiv.innerHTML = element.innerHTML;
 
 							// Debug: log the element with subscript before processing
-							console.log('Processing element with subscript:', {
-								rawHTML: element.innerHTML,
-								xpath: xpath,
-								key:
-									Object.entries(XPATH_CONFIG).find(([_, path]) => path === xpath)?.[0] || 'unknown'
-							});
+							// console.log('Processing element with subscript:', {
+							// 	rawHTML: element.innerHTML,
+							// 	xpath: xpath,
+							// 	key:
+							// 		Object.entries(XPATH_CONFIG).find(([_, path]) => path === xpath)?.[0] || 'unknown'
+							// });
 
 							// Process the HTML to handle subscript tags properly
 							// This ensures digits in <sub> tags are correctly merged into the numeric value
@@ -191,10 +191,10 @@ async function scrapeDataFromActiveTab(): Promise<AxiomTokenData | null> {
 							}
 
 							// Debug: log the processed result
-							console.log('Processed result:', {
-								result: result.trim(),
-								originalHTML: element.innerHTML
-							});
+							// console.log('Processed result:', {
+							// 	result: result.trim(),
+							// 	originalHTML: element.innerHTML
+							// });
 
 							return result.trim();
 						}
@@ -250,7 +250,7 @@ async function scrapeDataFromActiveTab(): Promise<AxiomTokenData | null> {
 				};
 
 				// Debug: Log the complete structured data
-				console.log('Axiom Scraper - Complete Data:', structuredData);
+				// console.log('Axiom Scraper - Complete Data:', structuredData);
 
 				return structuredData;
 				// ----- Content Script Logic Ends -----
