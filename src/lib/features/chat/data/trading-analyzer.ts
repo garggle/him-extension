@@ -54,7 +54,6 @@ export interface TokenSnapshot {
 		timeframe: string;
 		netVolume: string;
 	};
-	chartImage?: string; // Optional base64 image of the chart
 }
 
 // --- START: Card Structure Interfaces ---
@@ -202,13 +201,6 @@ TOKEN METRICS:
 - Holders: ${snapshot.tokenInfo.holders}
 - Pro Traders: ${snapshot.tokenInfo.proTraders}
 - Dexscreener Paid: ${snapshot.tokenInfo.dexPaid}`;
-
-		// Add chart image if available
-		if (snapshot.chartImage) {
-			context += `\n\nCHART VISUAL ANALYSIS:
-[This is a chart image in base64 format. Please analyze the price action, volume patterns, support/resistance levels, and any notable chart patterns visible.]
-${snapshot.chartImage}`;
-		}
 	}
 
 	// Instructions for the LLM to generate JSON
@@ -363,13 +355,6 @@ TOKEN METRICS:
 - Holders: ${snapshot.tokenInfo.holders}
 - Pro Traders: ${snapshot.tokenInfo.proTraders}
 - Dexscreener Paid: ${snapshot.tokenInfo.dexPaid}`;
-
-		// Add chart image if available
-		if (snapshot.chartImage) {
-			context += `\n\nCHART VISUAL ANALYSIS:
-[This is a chart image in base64 format. Please analyze the price action, volume patterns, support/resistance levels, and any notable chart patterns visible.]
-${snapshot.chartImage}`;
-		}
 	}
 
 	// Instructions for the LLM to generate JSON

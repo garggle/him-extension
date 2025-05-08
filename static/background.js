@@ -11,7 +11,7 @@ chrome.runtime.onInstalled.addListener(() => {
 			{
 				id: 'axiom-analyzer',
 				matches: ['*://axiom.trade/meme/*'],
-				js: ['html2canvas.min.js', 'content-scripts/axiom-analyzer.js'],
+				js: ['content-scripts/axiom-analyzer.js'],
 				runAt: 'document_idle'
 			}
 		])
@@ -62,21 +62,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 		if (!message.analysisResult) {
 			sendResponse({ success: false, error: 'Missing analysis result data' });
 			return false;
-		}
-
-		// Check if snapshot contains a large chartImage and optimize if needed
-		if (message.snapshot && message.snapshot.chartImage) {
-			// If the chartImage is very large (over 500KB), we need to reduce its size
-			// Base64 strings are approximately 1.37x the size of the actual data
-			const estimatedSizeInBytes = (message.snapshot.chartImage.length * 0.75);
-			const maxSizeInBytes = 500 * 1024; // 500KB
-
-			if (estimatedSizeInBytes > maxSizeInBytes) {
-				console.log(`Chart image is too large (${Math.round(estimatedSizeInBytes/1024)}KB), optimizing...`);
-				// Keep only the first part of the image to reduce size
-				// This is a simple approach - a better one would be to resize the image properly
-				message.snapshot.chartImage = message.snapshot.chartImage.substring(0, maxSizeInBytes * 1.37);
-			}
 		}
 
 		// Forward the message to the extension page via Chrome storage
