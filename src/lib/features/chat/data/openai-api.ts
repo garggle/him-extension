@@ -139,7 +139,8 @@ function prepareHistoryForApi(history: HistoryMessage[]): HistoryMessage[] {
  */
 export async function sendChatRequest(
 	message: string,
-	history: HistoryMessage[] = []
+	history: HistoryMessage[] = [],
+	isJsonResponse: boolean = false
 ): Promise<string> {
 	try {
 		// Get the API key
@@ -170,7 +171,7 @@ export async function sendChatRequest(
 			body: JSON.stringify({
 				model: 'gpt-4.1',
 				messages: messages,
-				response_format: { type: 'json_object' }
+				response_format: isJsonResponse ? { type: 'json_object' } : undefined
 			})
 		});
 

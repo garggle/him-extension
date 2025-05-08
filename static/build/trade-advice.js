@@ -70,7 +70,7 @@ function prepareHistoryForApi(history) {
   }
   return mergedHistory;
 }
-async function sendChatRequest(message, history = []) {
+async function sendChatRequest(message, history = [], isJsonResponse = false, messageId) {
   try {
     const apiKey = await getApiKey();
     const mergedHistory = prepareHistoryForApi(history);
@@ -93,7 +93,9 @@ async function sendChatRequest(message, history = []) {
       body: JSON.stringify({
         model: "gpt-4.1",
         messages,
-        response_format: { type: "json_object" }
+        response_format: isJsonResponse ? { type: "json_object" } : void 0,
+        user: messageId?.toString()
+        // Add messageId as user identifier
       })
     });
     if (!response.ok) {
@@ -231,10 +233,10 @@ function getManipulationLevel(score) {
     return "High";
   return "Extreme";
 }
-async function getEnhancedTradeAdvice(enhancedResult, snapshot) {
+async function getEnhancedTradeAdvice(enhancedResult, snapshot, messageId) {
   try {
     const prompt = formatEnhancedAnalysisPrompt(enhancedResult, snapshot);
-    const jsonResponseString = await sendChatRequest(prompt, []);
+    const jsonResponseString = await sendChatRequest(prompt, [], true, messageId);
     const adviceCards = JSON.parse(jsonResponseString);
     return adviceCards;
   } catch (error) {

@@ -269,11 +269,7 @@ export async function getEnhancedTradeAdvice(
 		// Format the data into a prompt requesting JSON
 		const prompt = formatEnhancedAnalysisPrompt(enhancedResult, snapshot);
 
-		// Send to OpenAI API - ASSUMES sendChatRequest is updated for JSON
-		// IMPORTANT: sendChatRequest in './openai-api.js' MUST be modified
-		// to set `response_format: { type: "json_object" }` in the API call
-		// and return the JSON string from the response.
-		const jsonResponseString = await sendChatRequest(prompt, []);
+		const jsonResponseString = await sendChatRequest(prompt, [], true);
 
 		// Parse the JSON response
 		const adviceCards = JSON.parse(jsonResponseString) as TradingAdviceCards;
@@ -306,7 +302,7 @@ export async function getTradeAdvice(
 
 		// Legacy format handling
 		const prompt = formatLegacyAnalysisPrompt(analysisResult, snapshot);
-		const jsonResponseString = await sendChatRequest(prompt, []);
+		const jsonResponseString = await sendChatRequest(prompt, [], true);
 
 		try {
 			// Try to parse the response as JSON

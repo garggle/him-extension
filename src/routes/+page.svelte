@@ -1,6 +1,6 @@
 <script lang="ts">
-	import ApiKeySetup from '$lib/features/chat/ApiKeySetup.svelte';
 	import ChatArea from '$lib/features/chat/ChatArea.svelte';
+	import InputArea from '$lib/features/chat/InputArea.svelte';
 	import {
 		hasApiKey,
 		sendChatRequest,
@@ -305,7 +305,8 @@
 			const reply = await sendChatRequest(
 				userMessage,
 				// Send only the last 10 messages to keep the context manageable
-				messages.slice(-10) as HistoryMessage[]
+				messages.slice(-10) as HistoryMessage[],
+				false
 			);
 
 			// Split the response into multiple messages if needed
@@ -408,35 +409,11 @@
 		</div>
 	</header>
 
-	{#if !apiKeyConfigured}
-		<!-- API Key Setup UI -->
-		<div class="flex-1 flex items-center justify-center p-4">
-			{#if apiKeyError}
-				<div
-					class="text-red-400 text-sm mb-4 absolute top-[60px] p-2 bg-red-950/30 rounded border border-red-900/50"
-				>
-					{apiKeyError}
-				</div>
-			{/if}
-			<ApiKeySetup onComplete={() => (apiKeyConfigured = true)} />
-		</div>
-	{:else}
-		<!-- Chat area (messages) -->
-		<ChatArea {messages} {isTyping} />
+	<!-- Chat area (messages) -->
+	<ChatArea {messages} {isTyping} />
 
-		<!-- Input area -->
-		<div class="relative">
-			{#if apiKeyError}
-				<div class="absolute bottom-full left-0 right-0 mb-2 flex justify-center">
-					<button
-						on:click={resetApiConfig}
-						class="text-sm text-red-400 bg-red-950/30 px-3 py-1 rounded border border-red-900/50"
-					>
-						API Key Error - Click to reconfigure
-					</button>
-				</div>
-			{/if}
-			<!-- <InputArea bind:value={currentInput} onsend={handleSend} disabled={isLoading || isTyping} /> -->
-		</div>
-	{/if}
+	<!-- Input area -->
+	<div class="relative">
+		<InputArea bind:value={currentInput} onsend={handleSend} disabled={isLoading || isTyping} />
+	</div>
 </div>

@@ -3,7 +3,7 @@
 	"description": "An AI trading assistant for market insights and sentiment analysis",
 	"version": "1.0",
 	"manifest_version": 3,
-	"permissions": ["sidePanel", "tabs", "scripting", "clipboardRead", "clipboardWrite", "storage"],
+	"permissions": ["sidePanel", "scripting", "storage"],
 	"host_permissions": [
 		"*://*.axiom.trade/*",
 		"https://api.geckoterminal.com/*",
