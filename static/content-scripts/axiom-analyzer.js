@@ -324,8 +324,12 @@ function injectAnalyzerButton() {
 		let targetElement = null;
 
 		// Method 1: Primary XPath approach
-		const targetXPath =
-			'/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[2]/div[2]/div/div[1]/div[4]';
+		let targetXPath;
+		if (document.querySelector('.uxento-dex-banner')) {
+			targetXPath = '/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[3]/div[2]/div/div[1]/div[4]';
+		} else {
+			targetXPath = '/html/body/div[1]/div[3]/div/div/div/div/div[2]/div[2]/div[2]/div/div[1]/div[4]';
+		}
 		targetElement = getElementByXPath(targetXPath);
 
 		// Method 2: Look for specific dashboard elements if XPath fails

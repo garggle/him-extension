@@ -43,8 +43,7 @@ async function getApiKey() {
   });
 }
 function prepareHistoryForApi(history) {
-  if (history.length <= 1)
-    return history;
+  if (history.length <= 1) return history;
   const mergedHistory = [];
   let currentSender = null;
   let currentText = "";
@@ -70,7 +69,7 @@ function prepareHistoryForApi(history) {
   }
   return mergedHistory;
 }
-async function sendChatRequest(message, history = [], isJsonResponse = false, messageId) {
+async function sendChatRequest(message, history = [], isJsonResponse = false) {
   try {
     const apiKey = await getApiKey();
     const mergedHistory = prepareHistoryForApi(history);
@@ -93,9 +92,7 @@ async function sendChatRequest(message, history = [], isJsonResponse = false, me
       body: JSON.stringify({
         model: "gpt-4.1",
         messages,
-        response_format: isJsonResponse ? { type: "json_object" } : void 0,
-        user: messageId?.toString()
-        // Add messageId as user identifier
+        response_format: isJsonResponse ? { type: "json_object" } : void 0
       })
     });
     if (!response.ok) {
@@ -205,38 +202,28 @@ The JSON object MUST strictly follow this structure:
 }
 function getIndicatorStatus(value, isPositiveOnly = false) {
   if (isPositiveOnly) {
-    if (value >= 0.8)
-      return "Excellent";
-    if (value >= 0.5)
-      return "Good";
-    if (value >= 0.3)
-      return "Moderate";
+    if (value >= 0.8) return "Excellent";
+    if (value >= 0.5) return "Good";
+    if (value >= 0.3) return "Moderate";
     return "Low";
   } else {
-    if (value >= 0.5)
-      return "Bullish";
-    if (value >= 0.1)
-      return "Slightly Bullish";
-    if (value > -0.1)
-      return "Neutral";
-    if (value > -0.5)
-      return "Slightly Bearish";
+    if (value >= 0.5) return "Bullish";
+    if (value >= 0.1) return "Slightly Bullish";
+    if (value > -0.1) return "Neutral";
+    if (value > -0.5) return "Slightly Bearish";
     return "Bearish";
   }
 }
 function getManipulationLevel(score) {
-  if (score < 0.2)
-    return "Low";
-  if (score < 0.5)
-    return "Moderate";
-  if (score < 0.8)
-    return "High";
+  if (score < 0.2) return "Low";
+  if (score < 0.5) return "Moderate";
+  if (score < 0.8) return "High";
   return "Extreme";
 }
-async function getEnhancedTradeAdvice(enhancedResult, snapshot, messageId) {
+async function getEnhancedTradeAdvice(enhancedResult, snapshot) {
   try {
     const prompt = formatEnhancedAnalysisPrompt(enhancedResult, snapshot);
-    const jsonResponseString = await sendChatRequest(prompt, [], true, messageId);
+    const jsonResponseString = await sendChatRequest(prompt, [], true);
     const adviceCards = JSON.parse(jsonResponseString);
     return adviceCards;
   } catch (error) {
