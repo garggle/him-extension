@@ -175,6 +175,9 @@
 						await addMessagesProgressively(messageChunks);
 					}
 				}
+			} else if (message.type === 'SET_TYPING_INDICATOR') {
+				// Update the typing indicator state
+				isTyping = message.isTyping;
 			}
 		});
 	}
@@ -353,43 +356,42 @@
 		const messages: string[] = [];
 
 		// Action Strategy card
-		let actionMessage = `${cards.actionStrategy.header}\n`;
+		let actionMessage = `${cards.actionStrategy.header}\n\n`;
 		actionMessage += `Entry: ${cards.actionStrategy.body.entry}\n`;
 		actionMessage += `TP/SL: ${cards.actionStrategy.body.tp_sl}\n`;
-		actionMessage += `Timeframe: ${cards.actionStrategy.body.timeframe}\n`;
-		actionMessage += `Reason: ${cards.actionStrategy.body.reason}`;
+		actionMessage += `Timeframe: ${cards.actionStrategy.body.timeframe}`;
 		messages.push(actionMessage);
 
 		// Liquidity card
-		let liquidityMessage = `${cards.liquidityPump.header}\n`;
+		let liquidityMessage = `${cards.liquidityPump.header}\n\n`;
+		liquidityMessage += `MCap: ${cards.liquidityPump.body.mcap}\n`;
 		liquidityMessage += `Liquidity: ${cards.liquidityPump.body.liquidity}\n`;
 		liquidityMessage += `Volume: ${cards.liquidityPump.body.net_volume}\n`;
-		liquidityMessage += `Buyers/Sellers: ${cards.liquidityPump.body.buyer_seller_ratio}\n`;
+		liquidityMessage += `Buyers/Sellers: ${cards.liquidityPump.body.buyer_seller_ratio}\n\n`;
 		liquidityMessage += `${cards.liquidityPump.body.interpretation}`;
 		messages.push(liquidityMessage);
 
 		// Holder Structure card
-		let holderMessage = `${cards.holderStructure.header}\n`;
+		let holderMessage = `${cards.holderStructure.header}\n\n`;
 		holderMessage += `Holders: ${cards.holderStructure.body.holders}\n`;
 		holderMessage += `Pro traders: ${cards.holderStructure.body.pro_traders}\n`;
-		holderMessage += `Top 10: ${cards.holderStructure.body.top_10_pct}\n`;
+		holderMessage += `Top 10: ${cards.holderStructure.body.top_10_pct}\n\n`;
 		holderMessage += `${cards.holderStructure.body.interpretation}`;
 		messages.push(holderMessage);
 
 		// Manipulation Risk card
-		let riskMessage = `${cards.manipulationRisk.header}\n`;
+		let riskMessage = `${cards.manipulationRisk.header}\n\n`;
 		riskMessage += `Insider: ${cards.manipulationRisk.body.insider_pct}\n`;
 		riskMessage += `Dev: ${cards.manipulationRisk.body.dev_pct}\n`;
 		riskMessage += `Snipers: ${cards.manipulationRisk.body.snipers_pct}\n`;
 		riskMessage += `LP Burned: ${cards.manipulationRisk.body.lp_burned_pct}\n`;
-		riskMessage += `Bundlers: ${cards.manipulationRisk.body.bundlers_pct}\n`;
+		riskMessage += `Bundlers: ${cards.manipulationRisk.body.bundlers_pct}\n\n`;
 		riskMessage += `${cards.manipulationRisk.body.interpretation}`;
 		messages.push(riskMessage);
 
 		// Final Call card
-		let finalMessage = `${cards.finalCall.header}\n`;
-		finalMessage += `Based on: ${cards.finalCall.body.based_on.join(', ')}\n`;
-		finalMessage += `${cards.finalCall.body.text}`;
+		let finalMessage = `${cards.finalCall.header}\n\n`;
+		finalMessage += `Based on: ${cards.finalCall.body.based_on.join(', ')}`;
 		messages.push(finalMessage);
 
 		return messages;

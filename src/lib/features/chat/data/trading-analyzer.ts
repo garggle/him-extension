@@ -8,7 +8,6 @@ import {
   type NormalizedFactors
 } from '$lib/features/trading/index.js';
 import { sendChatRequest } from './openai-api.js';
-
 // Interface for analysis result from the content script
 export interface AnalysisResult {
 	decision: string;
@@ -55,6 +54,7 @@ export interface TokenSnapshot {
 		timeframe: string;
 		netVolume: string;
 	};
+	chartImage?: string; // Optional base64 image of the chart
 }
 
 // --- START: Card Structure Interfaces ---
@@ -65,7 +65,6 @@ interface ActionStrategyCard {
 		entry: string; // e.g., "Now", "On -5% dip"
 		tp_sl: string; // e.g., "+15% / -8%"
 		timeframe: string; // e.g., "Hold 5–30min", "1–2hr", "wait for next volume spike"
-		reason: string; // e.g., "Volume spike + sniper buys = scalp setup."
 	};
 	metrics: string[]; // e.g., ["Net volume", "Buyers/sellers", ...]
 }
@@ -73,6 +72,7 @@ interface ActionStrategyCard {
 interface LiquidityPumpCard {
 	header: `✨ Liquidity Health: ${'Good' | 'Moderate' | 'Low' | string}`; // Allow other statuses
 	body: {
+		mcap: string; // e.g., "$100k"
 		liquidity: string; // e.g., "$100k"
 		net_volume: string; // e.g., "+$50k in 1h"
 		buyer_seller_ratio: string; // e.g., "150/50"
@@ -108,8 +108,7 @@ interface ManipulationRiskCard {
 interface FinalCallCard {
 	header: `🚨 Final Call: ${'High Exit Risk' | 'Potential Upside' | 'Monitor Closely' | string}`; // Allow other statuses
 	body: {
-		based_on: string[]; // e.g., ["Volume behavior", "Lack of holders", ...]
-		text: string; // e.g., "High risk of dump once hype fades. Wait for organic volume."
+		based_on: string[] // e.g., ["Volume behavior", "Lack of holders", ...]// e.g., "High risk of dump once hype fades. Wait for organic volume."
 	};
 	metrics: string[]; // e.g., ["Volume trend", "Buyer/seller ratio", ...]
 }
@@ -203,6 +202,13 @@ TOKEN METRICS:
 - Holders: ${snapshot.tokenInfo.holders}
 - Pro Traders: ${snapshot.tokenInfo.proTraders}
 - Dexscreener Paid: ${snapshot.tokenInfo.dexPaid}`;
+
+		// Add chart image if available
+		if (snapshot.chartImage) {
+			context += `\n\nCHART VISUAL ANALYSIS:
+[This is a chart image in base64 format. Please analyze the price action, volume patterns, support/resistance levels, and any notable chart patterns visible.]
+${snapshot.chartImage}`;
+		}
 	}
 
 	// Instructions for the LLM to generate JSON
@@ -211,15 +217,15 @@ INSTRUCTIONS:
 Based *only* on the provided Trading Opportunity Analysis Context, generate a JSON object containing practical advice for trading this SOLANA memecoin.
 The JSON object MUST strictly follow this structure:
 {
-  "actionStrategy": { "header": string, "body": { "entry": string, "tp_sl": string, "timeframe": string, "reason": string }, "metrics": string[] },
-  "liquidityPump": { "header": string, "body": { "liquidity": string, "net_volume": string, "buyer_seller_ratio": string, "interpretation": string }, "metrics": string[] },
+  "actionStrategy": { "header": string, "body": { "entry": string, "tp_sl": string, "timeframe": string }, "metrics": string[] },
+  "liquidityPump": { "header": string, "body": { "mcap": string, "liquidity": string, "net_volume": string, "buyer_seller_ratio": string, "interpretation": string }, "metrics": string[] },
   "holderStructure": { "header": string, "body": { "holders": string, "pro_traders": string, "top_10_pct": string, "interpretation": string }, "metrics": string[] },
   "manipulationRisk": { "header": string, "body": { "insider_pct": string, "dev_pct": string, "snipers_pct": string, "lp_burned_pct": string, "bundlers_pct": string, "interpretation": string }, "metrics": string[] },
-  "finalCall": { "header": string, "body": { "based_on": string[], "text": string }, "metrics": string[] }
+  "finalCall": { "header": string, "body": { "based_on": string[] }, "metrics": string[] }
 }
 
 - Headers should follow the examples: "✅ Strategy: ...", "✨ Liquidity Health: ...", "👥 Holder Risk: ...", "🐳 Manipulation Risk: ...", "⚠️ Final Call: ..."
-- Populate the body fields using the provided context. Be concise and specific (e.g., give percentages for TP/SL). Assume a standard memecoin goal of >60% profit if buying.
+- Populate the body fields using the provided context. Be concise and specific (e.g., give percentages for TP/SL). Assume a standard memecoin goal of >60% profit if buying. More than 100% and 200% is possible.
 - The 'metrics' arrays should list the key data points from the context that informed each card's analysis.
 - Respond ONLY with the JSON object. Do not include any other text, greetings, or explanations before or after the JSON. Ensure the JSON is valid.
 `;
@@ -357,6 +363,13 @@ TOKEN METRICS:
 - Holders: ${snapshot.tokenInfo.holders}
 - Pro Traders: ${snapshot.tokenInfo.proTraders}
 - Dexscreener Paid: ${snapshot.tokenInfo.dexPaid}`;
+
+		// Add chart image if available
+		if (snapshot.chartImage) {
+			context += `\n\nCHART VISUAL ANALYSIS:
+[This is a chart image in base64 format. Please analyze the price action, volume patterns, support/resistance levels, and any notable chart patterns visible.]
+${snapshot.chartImage}`;
+		}
 	}
 
 	// Instructions for the LLM to generate JSON
@@ -365,11 +378,11 @@ INSTRUCTIONS:
 Based *only* on the provided Trading Opportunity Analysis Context, generate a JSON object containing practical advice for trading this SOLANA memecoin.
 The JSON object MUST strictly follow this structure:
 {
-  "actionStrategy": { "header": string, "body": { "entry": string, "tp_sl": string, "timeframe": string, "reason": string }, "metrics": string[] },
-  "liquidityPump": { "header": string, "body": { "liquidity": string, "net_volume": string, "buyer_seller_ratio": string, "interpretation": string }, "metrics": string[] },
+  "actionStrategy": { "header": string, "body": { "entry": string, "tp_sl": string, "timeframe": string }, "metrics": string[] },
+  "liquidityPump": { "header": string, "body": { "mcap": string, "liquidity": string, "net_volume": string, "buyer_seller_ratio": string, "interpretation": string }, "metrics": string[] },
   "holderStructure": { "header": string, "body": { "holders": string, "pro_traders": string, "top_10_pct": string, "interpretation": string }, "metrics": string[] },
   "manipulationRisk": { "header": string, "body": { "insider_pct": string, "dev_pct": string, "snipers_pct": string, "lp_burned_pct": string, "bundlers_pct": string, "interpretation": string }, "metrics": string[] },
-  "finalCall": { "header": string, "body": { "based_on": string[], "text": string }, "metrics": string[] }
+  "finalCall": { "header": string, "body": { "based_on": string[] }, "metrics": string[] }
 }
 
 - Headers should follow the examples: "✅ Strategy: ...", "✨ Liquidity Health: ...", "👥 Holder Risk: ...", "🐳 Manipulation Risk: ...", "🚨 Final Call: ..."

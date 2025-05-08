@@ -7,7 +7,7 @@
 	"host_permissions": [
 		"*://*.axiom.trade/*",
 		"https://api.geckoterminal.com/*",
-		"https://api.openai.com/*"
+		"https://him-api-cr77.vercel.app/*"
 	],
 	"action": {
 		"default_title": "Open Him trading buddy",
@@ -34,7 +34,7 @@
 	"content_scripts": [
 		{
 			"matches": ["*://axiom.trade/meme/*"],
-			"js": ["content-scripts/axiom-analyzer.js"],
+			"js": ["html2canvas.min.js", "content-scripts/axiom-analyzer.js"],
 			"run_at": "document_idle"
 		}
 	]

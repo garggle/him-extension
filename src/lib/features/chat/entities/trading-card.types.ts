@@ -4,7 +4,6 @@ type StrategyCard = {
 	entry: string;
 	tp_sl: string;
 	timeframe: string;
-	reason: string;
 	metrics: string[];
 };
 

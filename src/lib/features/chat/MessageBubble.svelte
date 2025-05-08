@@ -33,7 +33,7 @@
 	// Process the message text to replace placeholders with highlighted values
 	const processedText = $derived(
 		text
-			.replace(/\n/g, '<br><br>') // Replace newlines with double <br> tags
+			.replace(/\n/g, '<br>') // Replace newlines with double <br> tags
 			.replace(
 				/{value}/g,
 				metadata?.value
