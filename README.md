@@ -1,4 +1,4 @@
-> Disclaimer: This is only a MVP, the code is pretty messy. We are working on a better extension made in React with WXT. An actual, well-thought architecture is developed for the future.
+> Disclaimer: This is only a MVP, the code is pretty messy. We are working on a better extension made in React with WXT. An actual, well-thought architecture is developed for the future, with actual calls to the blockchain via our dedicated RPC.
 
 # him Extension
 
