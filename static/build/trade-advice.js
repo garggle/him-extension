@@ -1,7 +1,7 @@
 // src/lib/features/chat/data/openai-api.ts
 async function sendChatRequest(message, history = [], isJsonResponse = false) {
   try {
-    const response = await fetch("https://him-api-cr77.vercel.app/api/openai", {
+    const response = await fetch("https://him-api.vercel.app/api/openai", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

@@ -19,7 +19,7 @@ export async function sendChatRequest(
 ): Promise<string> {
 	try {
 		// Call our backend API
-		const response = await fetch('https://him-api-cr77.vercel.app/api/openai', {
+		const response = await fetch('https://him-api.vercel.app/api/openai', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'

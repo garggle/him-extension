@@ -1,13 +1,12 @@
 {
 	"name": "him",
 	"description": "An AI trading assistant for market insights and sentiment analysis",
-	"version": "1.0",
+	"version": "1.2",
 	"manifest_version": 3,
 	"permissions": ["sidePanel", "scripting", "storage"],
 	"host_permissions": [
 		"*://*.axiom.trade/*",
-		"https://api.geckoterminal.com/*",
-		"https://him-api-cr77.vercel.app/*"
+		"https://him-api.vercel.app/*"
 	],
 	"action": {
 		"default_title": "Open Him trading buddy",
