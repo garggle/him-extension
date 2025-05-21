@@ -1,3 +1,5 @@
+> Disclaimer: This is only a MVP, the code is pretty messy. We are working on a better extension made in React with WXT. An actual, well-thought architecture is developed for the future.
+
 # him Extension
 
 A Chrome Extension featuring an AI chatbot interface called "Him" for providing market insights directly within your browser's side panel. Now featuring gpt-4.1 integration for intelligent responses.
@@ -40,35 +42,6 @@ pnpm dev
 # Build for production
 pnpm build
 ```
-
-### OpenAI Integration
-
-This project uses OpenAI's gpt-4.1 model to provide intelligent responses in the chat interface. To set up the OpenAI integration:
-
-1. Create an account at [OpenAI](https://openai.com) if you don't already have one
-2. Generate an API key in your OpenAI dashboard
-3. Add the API key to your `.env` file:
-   ```
-   OPENAI_API_KEY=your_actual_api_key_here
-   ```
-4. Restart your development server if it's already running
-
-### Loading the Extension
-
-1. Build the project: `pnpm build`
-2. Open Chrome and navigate to `chrome://extensions/`
-3. Enable "Developer mode"
-4. Click "Load unpacked" and select the `build` directory
-
-## Project Structure
-
-- `/src`: SvelteKit app code
-  - `/routes`: SvelteKit routes
-  - `/lib/components`: Reusable Svelte components
-- `/static`: Static assets and extension files
-  - `manifest.json`: Chrome extension manifest
-  - `background.js`: Service worker
-- `/build`: Built extension (after running `pnpm build`)
 
 ## Status
 
